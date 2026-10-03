@@ -40,6 +40,37 @@ export function logout(): Promise<unknown> {
 }
 
 /**
+ * 发送短信验证码：POST /api/auth/phone-number/send-otp（better-auth phoneNumber 插件）。
+ * 开发期验证码只打印在后端日志中。
+ */
+export function sendPhoneOtp(phone: string): Promise<{ message: string }> {
+  return http.Post('/auth/phone-number/send-otp', { phoneNumber: phone }, {
+    meta: { rawAuth: true },
+  }) as unknown as Promise<{ message: string }>
+}
+
+/**
+ * 手机号验证码登录：POST /api/auth/phone-number/verify。
+ * 校验通过后后端自动建会话并 Set-Cookie；用户不存在时按配置自动注册。
+ */
+export function loginWithPhoneOtp(phone: string, code: string): Promise<unknown> {
+  return http.Post('/auth/phone-number/verify', { phoneNumber: phone, code }, {
+    meta: { rawAuth: true },
+  }) as unknown as Promise<unknown>
+}
+
+/**
+ * 微信小程序「获取手机号」一键登录：POST /api/auth/wechat/phone-sign-in。
+ * @param phoneCode button open-type="getPhoneNumber" 回调中的 e.detail.code；
+ *                  后端 mock 模式下约定为 'mock:<手机号>'
+ */
+export function loginWithWechatPhone(phoneCode: string): Promise<unknown> {
+  return http.Post('/auth/wechat/phone-sign-in', { phoneCode }, {
+    meta: { rawAuth: true },
+  }) as unknown as Promise<unknown>
+}
+
+/**
  * 获取当前登录用户（GET /api/me，拦截器已解包 data，含 roles）。
  * @param silent 静默模式：401 时不弹提示、不跳转登录页（用于启动时探测会话）。
  */

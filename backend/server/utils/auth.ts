@@ -6,6 +6,8 @@ import * as schema from '../database/schema'
 import { ensureUserRoleByName, getRoleNamesByUserId } from '../database/repositories/roles'
 import { getEnv, getTrustedOrigins } from './env'
 import { logger } from './logger'
+import { isValidPhoneNumber, logSmsSender } from './sms'
+import { wechatPhone } from './auth-wechat'
 
 const env = getEnv()
 
@@ -50,11 +52,21 @@ export const auth = betterAuth({
   },
   plugins: [
     phoneNumber({
-      sendOTP: async ({ phoneNumber, code }) => {
-        // TODO: 接入真实短信服务商；当前初始化阶段仅输出到日志
-        logger.info(`[OTP] 向 ${phoneNumber} 发送验证码：${code}（未接入短信服务商）`)
+      // 6 位数字验证码，5 分钟有效，错误最多尝试 3 次（插件默认）
+      otpLength: 6,
+      expiresIn: 300,
+      phoneNumberValidator: isValidPhoneNumber,
+      // 开发期验证码仅写日志；接服务商时替换 logSmsSender 即可
+      sendOTP: logSmsSender,
+      // 验证码校验通过但用户不存在：自动建号（手机号即已验证），
+      // 由下方 databaseHooks.user.create.after 自动挂默认 user 角色
+      signUpOnVerification: {
+        // 客户端上送带国家号（如 '+8613800138000'），邮箱本地部分只保留数字
+        getTempEmail: (phone: string) => `${phone.replace(/\D/g, '')}@phone.local`
       }
-    })
+    }),
+    // 微信小程序「获取手机号」一键登录（/api/auth/wechat/phone-sign-in）
+    wechatPhone()
   ],
   databaseHooks: {
     user: {

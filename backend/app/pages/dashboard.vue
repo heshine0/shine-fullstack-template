@@ -40,7 +40,7 @@ onMounted(loadStats)
         你好，{{ user?.name || user?.email }}
       </h1>
       <p class="text-sm text-muted mt-1">
-        欢迎使用桐乡吾协管理后台。
+        欢迎使用桐乡武协管理后台。
       </p>
     </div>
 

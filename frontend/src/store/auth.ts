@@ -2,6 +2,9 @@ import type { AuthUser, LoginForm } from '@/api/auth'
 import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
 import * as authApi from '@/api/auth'
+// #ifndef H5
+import { cookieJar } from '@/http/cookie-jar'
+// #endif
 
 /**
  * 登录态存储（Cookie 单通道）。
@@ -33,6 +36,18 @@ export const useAuthStore = defineStore(
       return await fetchMe()
     }
 
+    /** 手机号 + 短信验证码登录（用户不存在时后端自动注册），随后补全用户信息。 */
+    async function loginByPhoneOtp(phone: string, code: string): Promise<AuthUser> {
+      await authApi.loginWithPhoneOtp(phone, code)
+      return await fetchMe()
+    }
+
+    /** 微信小程序「获取手机号」一键登录，随后补全用户信息。 */
+    async function loginByWechat(phoneCode: string): Promise<AuthUser> {
+      await authApi.loginWithWechatPhone(phoneCode)
+      return await fetchMe()
+    }
+
     /** 退出登录：通知后端清除会话，无论成败都清空本地用户。 */
     async function logout(): Promise<void> {
       try {
@@ -46,9 +61,12 @@ export const useAuthStore = defineStore(
       }
     }
 
-    /** 仅清空本地用户（401 拦截等场景）。 */
+    /** 仅清空本地用户（401 拦截等场景）；小程序端同时清空本地 cookie jar。 */
     function clear() {
       user.value = null
+      // #ifndef H5
+      cookieJar.clear()
+      // #endif
     }
 
     return {
@@ -57,6 +75,8 @@ export const useAuthStore = defineStore(
       isAdmin,
       fetchMe,
       login,
+      loginByPhoneOtp,
+      loginByWechat,
       logout,
       clear,
     }

@@ -1,6 +1,7 @@
 import AdapterUniapp from '@alova/adapter-uniapp'
 import { createAlova } from 'alova'
 import VueHook from 'alova/vue'
+import { cookieJar } from './cookie-jar'
 import { toLoginPage } from '@/utils/toLoginPage'
 
 /** 后端统一成功响应结构：{ code:'OK', data, pagination? } */
@@ -87,12 +88,24 @@ const alovaInstance = createAlova({
       'Accept': 'application/json, text/plain, */*',
       ...method.config.headers,
     }
+    // #ifndef H5
+    // 小程序/App：从本地 cookie 罐恢复会话（H5 由浏览器自动携带）
+    const cookieHeader = cookieJar.getCookieHeader()
+    if (cookieHeader) {
+      method.config.headers.Cookie = cookieHeader
+    }
+    // #endif
   },
 
   responded: {
     onSuccess(response: any, method: any) {
       const { config } = method
       const meta = (config.meta ?? {}) as RequestMeta
+
+      // #ifndef H5
+      // 小程序/App：落盘 Set-Cookie（登录下发、会话轮换都依赖此步）
+      cookieJar.saveFromResponseHeaders(response?.header)
+      // #endif
 
       // 上传/下载请求原样返回，交由调用方处理
       if (config.requestType === 'upload' || config.requestType === 'download') {

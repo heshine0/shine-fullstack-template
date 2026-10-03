@@ -14,7 +14,12 @@ const envSchema = z.object({
   ADMIN_EMAIL: z.string().email().optional(),
   ADMIN_PASSWORD: z.string().min(8).optional(),
   RATE_LIMIT_GLOBAL_MAX: z.coerce.number().int().positive().default(300),
-  RATE_LIMIT_SENSITIVE_MAX: z.coerce.number().int().positive().default(10)
+  RATE_LIMIT_SENSITIVE_MAX: z.coerce.number().int().positive().default(10),
+  // 微信小程序「获取手机号」：非 mock 模式下调用微信 API 时必须提供
+  WECHAT_APPID: z.string().optional(),
+  WECHAT_SECRET: z.string().optional(),
+  // 开发联调用：仅字符串 'true' 视为开启（不能用 z.coerce.boolean——它会把 'false' 也转成 true）
+  WECHAT_MOCK: z.string().default('false').transform(v => v === 'true')
 })
 
 export type Env = z.infer<typeof envSchema>

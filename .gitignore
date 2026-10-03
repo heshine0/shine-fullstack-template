@@ -1,0 +1,47 @@
+# =====================
+# 依赖
+# =====================
+node_modules/
+
+# =====================
+# 构建产物
+# =====================
+.nuxt/
+.output/
+.nitro/
+.data/
+dist/
+unpackage/
+
+# =====================
+# 日志与缓存
+# =====================
+*.log
+logs/
+.eslintcache
+.stylelintcache
+.cache/
+
+# =====================
+# 环境变量（含密钥，禁止入库）
+# backend/.env 已由 backend/.gitignore 忽略；
+# frontend/env/ 下的 *.env 为无密钥的构建配置，需要入库，
+# 因此这里仅用前导 "/" 锚定仓库根目录，不误伤 frontend/env。
+# =====================
+/.env
+/.env.*
+*.env.local
+
+# =====================
+# uni-app 插件目录（保留占位 .gitkeep）
+# =====================
+**/uni_modules/*
+!**/uni_modules/.gitkeep
+
+# =====================
+# 系统 / 编辑器
+# =====================
+.DS_Store
+Thumbs.db
+.idea/
+.hbuilderx/

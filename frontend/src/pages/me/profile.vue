@@ -110,6 +110,7 @@ async function doUpdateName(name: string) {
 
 // —— 手机号换绑 ——
 const editingPhone = ref(false)
+const phoneModalVisible = ref(false)
 const newPhone = ref('')
 const phoneCode = ref('')
 const sendingOtp = ref(false)
@@ -135,6 +136,23 @@ function startCountdown() {
       countdownTimer = null
     }
   }, 1000)
+}
+
+function openPhoneModal() {
+  editingPhone.value = true
+  nextTick(() => {
+    phoneModalVisible.value = true
+  })
+}
+
+function closePhoneModal() {
+  // 提交中不允许误关
+  if (submittingPhone.value)
+    return
+  phoneModalVisible.value = false
+  setTimeout(() => {
+    editingPhone.value = false
+  }, 200)
 }
 
 async function handleSendOtp() {
@@ -180,6 +198,7 @@ async function handleConfirmPhone() {
   try {
     await auth.changePhone(`+86${normalized}`, phoneCode.value.trim())
     uni.showToast({ title: '手机号已更新', icon: 'success' })
+    phoneModalVisible.value = false
     editingPhone.value = false
     newPhone.value = ''
     phoneCode.value = ''
@@ -227,7 +246,7 @@ async function handleConfirmPhone() {
         <view
           class="flex items-center border-t border-gray-100 px-4 py-3.5"
           hover-class="bg-gray-50"
-          @click="editingPhone = !editingPhone"
+          @click="openPhoneModal"
         >
           <text class="text-4 text-gray-800">手机号</text>
           <text class="ml-auto text-4 text-gray-400">
@@ -247,47 +266,63 @@ async function handleConfirmPhone() {
         </view>
       </view>
 
-      <!-- 换绑手机号 -->
-      <view v-if="editingPhone" class="mt-3 rounded-3 bg-white p-4 shadow-sm">
-        <view class="mb-3 text-4 text-gray-900 font-medium">
-          更换手机号
-        </view>
-        <view class="mb-3 h-11 flex items-center overflow-hidden border border-gray-400 rounded-2 border-solid bg-white">
-          <view class="h-full flex items-center border-r border-gray-400 bg-gray-50 px-3 text-4 text-gray-700">
-            +86
+      <!-- 换绑手机号弹窗 -->
+      <view
+        v-if="editingPhone"
+        class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-8 transition-opacity duration-200"
+        :class="phoneModalVisible ? 'opacity-100' : 'opacity-0'"
+        @click="closePhoneModal"
+        @touchmove.stop.prevent
+      >
+        <view
+          class="w-full rounded-3 bg-white p-4 shadow-lg transition-all duration-200"
+          :class="phoneModalVisible ? 'scale-100 opacity-100' : 'scale-95 opacity-0'"
+          @click.stop
+        >
+          <view class="mb-3 flex items-center">
+            <text class="text-4 text-gray-900 font-medium">更换手机号</text>
+            <view
+              class="i-carbon-close ml-auto p-1 text-4 text-gray-400"
+              @click="closePhoneModal"
+            />
           </view>
-          <input
-            v-model="newPhone"
-            type="number"
-            :maxlength="11"
-            placeholder="请输入新手机号"
-            class="h-full flex-1 px-3 text-4"
-          >
-        </view>
-        <view class="mb-4 flex items-center gap-3">
-          <input
-            v-model="phoneCode"
-            type="number"
-            :maxlength="6"
-            placeholder="请输入验证码"
-            class="h-11 flex-1 border border-gray-400 rounded-2 border-solid px-3 text-4"
-          >
+          <view class="mb-3 h-11 flex items-center overflow-hidden border border-gray-400 rounded-2 border-solid bg-white">
+            <view class="h-full flex items-center border-r border-gray-400 bg-gray-50 px-3 text-4 text-gray-700">
+              +86
+            </view>
+            <input
+              v-model="newPhone"
+              type="number"
+              :maxlength="11"
+              placeholder="请输入新手机号"
+              class="h-full flex-1 px-3 text-4"
+            >
+          </view>
+          <view class="mb-4 flex items-center gap-3">
+            <input
+              v-model="phoneCode"
+              type="number"
+              :maxlength="6"
+              placeholder="请输入验证码"
+              class="h-11 flex-1 border border-gray-400 rounded-2 border-solid px-3 text-4"
+            >
+            <button
+              :disabled="countdown > 0 || sendingOtp"
+              class="h-11 shrink-0 rounded-2 px-3 text-4"
+              :class="countdown > 0 || sendingOtp ? 'bg-gray-100 text-gray-400' : 'bg-green-50 text-green-700'"
+              @click="handleSendOtp"
+            >
+              {{ countdown > 0 ? `${countdown}s 后重发` : '获取验证码' }}
+            </button>
+          </view>
           <button
-            :disabled="countdown > 0 || sendingOtp"
-            class="h-11 shrink-0 rounded-2 px-3 text-4"
-            :class="countdown > 0 || sendingOtp ? 'bg-gray-100 text-gray-400' : 'bg-green-50 text-green-700'"
-            @click="handleSendOtp"
+            :loading="submittingPhone"
+            class="h-11 w-full rounded-2 bg-green-600 text-4 text-white"
+            @click="handleConfirmPhone"
           >
-            {{ countdown > 0 ? `${countdown}s 后重发` : '获取验证码' }}
+            确认绑定
           </button>
         </view>
-        <button
-          :loading="submittingPhone"
-          class="h-11 w-full rounded-2 bg-green-600 text-4 text-white"
-          @click="handleConfirmPhone"
-        >
-          确认绑定
-        </button>
       </view>
     </block>
   </view>

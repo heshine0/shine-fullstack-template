@@ -3,7 +3,7 @@ import { tabBar } from './src/tabbar/config'
 
 export default defineUniPages({
   globalStyle: {
-    navigationStyle: 'default',
+    navigationStyle: 'custom',
     navigationBarTitleText: 'unibest',
     navigationBarBackgroundColor: '#f8f8f8',
     navigationBarTextStyle: 'black',

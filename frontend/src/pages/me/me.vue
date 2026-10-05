@@ -123,8 +123,10 @@ async function handleLogout() {
 
     <!-- 菜单分组 -->
     <view v-for="(group, gi) in menuGroups" :key="gi" class="mt-3 overflow-hidden rounded-3 bg-white shadow-sm">
-      <view v-for="(item, ii) in group" :key="item.key" class="flex items-center px-4 py-3"
-        :class="ii > 0 ? 'border-t border-gray-100' : ''" hover-class="bg-gray-50" @click="handleMenuTap(item)">
+      <view
+        v-for="(item, ii) in group" :key="item.key" class="flex items-center px-4 py-3"
+        :class="ii > 0 ? 'border-t border-gray-100' : ''" hover-class="bg-gray-50" @click="handleMenuTap(item)"
+      >
         <view class="h-8 w-8 center rounded-lg bg-gray-100 text-gray-600">
           <view class="text-4" :class="item.icon" />
         </view>
@@ -137,8 +139,10 @@ async function handleLogout() {
     </view>
 
     <view class="m-8">
-      <button v-if="auth.isLoggedIn" :loading="loggingOut"
-        class="h-11 border border-red-200 rounded-2 bg-white text-4 text-red-500" @click="handleLogout">
+      <button
+        v-if="auth.isLoggedIn" :loading="loggingOut"
+        class="h-11 border border-red-200 rounded-2 bg-white text-4 text-red-500" @click="handleLogout"
+      >
         退出登录
       </button>
     </view>

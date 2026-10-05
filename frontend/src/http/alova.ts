@@ -88,7 +88,7 @@ const alovaInstance = createAlova({
     const isUpload = method.config.requestType === 'upload'
     method.config.headers = {
       ...(isUpload ? {} : { 'Content-Type': 'application/json' }),
-      'Accept': 'application/json, text/plain, */*',
+      Accept: 'application/json, text/plain, */*',
       ...method.config.headers,
     }
     // #ifndef H5

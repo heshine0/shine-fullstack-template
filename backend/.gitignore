@@ -6,6 +6,9 @@
 .cache
 dist
 
+# 本地磁盘存储的用户上传文件（头像）
+uploads
+
 # Node dependencies
 node_modules
 

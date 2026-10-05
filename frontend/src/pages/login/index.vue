@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import { sendPhoneOtp } from '@/api/auth'
 import { useAuthStore } from '@/store/auth'
+import { ensureDecodeURIComponent, HOME_PAGE } from '@/utils'
 
 definePage({
   style: {
@@ -9,6 +10,25 @@ definePage({
 })
 
 const auth = useAuthStore()
+
+// 登录成功后的回跳地址，由登录入口通过 ?redirect= 携带；缺省回兜底首页
+const redirectUrl = ref('')
+
+onLoad((options) => {
+  const raw = options?.redirect
+  if (typeof raw !== 'string' || !raw)
+    return
+  // 部分平台 onLoad 参数已解码，仅在仍为编码形态时解码，避免双重解码
+  const decoded = raw.startsWith('%') ? ensureDecodeURIComponent(raw) : raw
+  // 仅允许应用内绝对路径，拒绝 http(s)://、// 等外链
+  if (decoded.startsWith('/') && !decoded.startsWith('//'))
+    redirectUrl.value = decoded
+})
+
+/** 登录成功后优先回跳来源页，reLaunch 同时兼容 tabbar 页与普通页 */
+function navigateAfterLogin() {
+  uni.reLaunch({ url: redirectUrl.value || HOME_PAGE })
+}
 
 type LoginTab = 'email' | 'phone'
 const tab = ref<LoginTab>('email')
@@ -106,10 +126,10 @@ onUnmounted(() => {
   }
 })
 
-// 已登录用户进入登录页时直接回首页
+// 已登录用户进入登录页时直接跳到来源页（无 redirect 时回首页）
 onShow(() => {
   if (auth.isLoggedIn) {
-    uni.reLaunch({ url: '/pages/index/index' })
+    navigateAfterLogin()
   }
 })
 
@@ -126,7 +146,7 @@ async function handleEmailLogin() {
   try {
     await auth.login({ email: email.value.trim(), password: password.value })
     uni.showToast({ title: '登录成功', icon: 'success' })
-    uni.reLaunch({ url: '/pages/index/index' })
+    navigateAfterLogin()
   }
   catch {
     // 错误提示已由响应拦截器统一弹出
@@ -192,7 +212,7 @@ async function handlePhoneLogin() {
   try {
     await auth.loginByPhoneOtp(fullPhoneNumber(), code.value.trim())
     uni.showToast({ title: '登录成功', icon: 'success' })
-    uni.reLaunch({ url: '/pages/index/index' })
+    navigateAfterLogin()
   }
   catch {
     // 错误提示已由响应拦截器统一弹出
@@ -212,7 +232,7 @@ async function loginByWechatCode(phoneCode: string) {
   try {
     await auth.loginByWechat(phoneCode)
     uni.showToast({ title: '登录成功', icon: 'success' })
-    uni.reLaunch({ url: '/pages/index/index' })
+    navigateAfterLogin()
   }
   catch {
     // 错误提示已由响应拦截器统一弹出
@@ -256,13 +276,12 @@ function onMockWechatLogin() {
 <template>
   <view class="min-h-screen flex flex-col bg-gray-50 px-8 pt-safe">
     <view class="mb-8 text-center">
-      <!-- logo -->  
+      <!-- logo -->
       <image
         src="/static/logo.svg"
         mode="aspectFit"
         class="mx-auto mb-4 h-40 w-40"
-      >
-      </image>
+      />
       <view class="text-6 text-gray-900 font-bold">
         桐乡武协
       </view>
@@ -290,14 +309,14 @@ function onMockWechatLogin() {
         手机号快捷登录
       </button>
 
-      <view class="text-center m-6" v-if="!useOtherLogin">
-        <text class="underline underline-offset-2 cursor-pointer" @click="useOtherLogin = true">使用其他登录方式</text>
+      <view v-if="!useOtherLogin" class="m-6 text-center">
+        <text class="cursor-pointer underline underline-offset-2" @click="useOtherLogin = true">使用其他登录方式</text>
       </view>
     </view>
     <!-- #endif -->
 
     <!-- 登录方式切换 -->
-    <view class="rounded-4 bg-white  shadow-sm mb-8" v-if="useOtherLogin">
+    <view v-if="useOtherLogin" class="mb-8 rounded-4 bg-white shadow-sm">
       <view class="flex p-4">
         <view
           class="h-9 flex flex-1 items-center justify-center rounded-1.5 text-4"
@@ -326,7 +345,7 @@ function onMockWechatLogin() {
               v-model="email"
               type="text"
               placeholder="请输入邮箱"
-              class="h-11 border-solid border-gray-400 rounded-2 px-3 text-4"
+              class="h-11 border-gray-400 rounded-2 border-solid px-3 text-4"
             >
           </view>
 
@@ -338,7 +357,7 @@ function onMockWechatLogin() {
               v-model="password"
               password
               placeholder="请输入密码"
-              class="h-11 border-solid border-gray-400 rounded-2 px-3 text-4"
+              class="h-11 border-gray-400 rounded-2 border-solid px-3 text-4"
             >
           </view>
 
@@ -357,7 +376,7 @@ function onMockWechatLogin() {
             <view class="mb-2 text-3.5 text-gray-600">
               手机号
             </view>
-            <view class="h-11 flex overflow-hidden border-solid border-gray-400 rounded-2 bg-white">
+            <view class="h-11 flex overflow-hidden border-gray-400 rounded-2 border-solid bg-white">
               <view
                 class="h-full flex items-center gap-1 border-r border-gray-400 bg-gray-50 px-3 text-4 text-gray-700"
                 @click="pickCountryCode"
@@ -385,7 +404,7 @@ function onMockWechatLogin() {
                 type="number"
                 :maxlength="6"
                 placeholder="请输入验证码"
-                class="h-11 flex-1 border-solid border-gray-400 rounded-2 px-3 text-4"
+                class="h-11 flex-1 border-gray-400 rounded-2 border-solid px-3 text-4"
               >
               <button
                 :disabled="countdown > 0 || sendingOtp"
@@ -412,7 +431,7 @@ function onMockWechatLogin() {
     <!-- 隐私协议勾选：未勾选时禁止任何登录方式 -->
     <view class="mb-8 flex items-center justify-center gap-2 px-4">
       <view
-        class="center h-4 w-4 shrink-0 rounded-0.5 border-solid"
+        class="h-4 w-4 center shrink-0 rounded-0.5 border-solid"
         :class="agreed ? 'border-green-600 bg-green-600 text-white' : 'border-gray-400 bg-white text-transparent'"
         @click="agreed = !agreed"
       >

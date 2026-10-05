@@ -23,6 +23,15 @@ describe('isPublicPath', () => {
     expect(isPublicPath('/api/authenticate')).toBe(false)
   })
 
+  it('allows public avatar reads under /api/uploads/avatars/', () => {
+    expect(isPublicPath('/api/uploads/avatars/u-1728000000.jpg')).toBe(true)
+  })
+
+  it('does not treat sibling prefixes of /api/uploads as public', () => {
+    expect(isPublicPath('/api/uploads-secret')).toBe(false)
+    expect(isPublicPath('/api/uploadshook')).toBe(false)
+  })
+
   it('requires authentication for regular API paths', () => {
     expect(isPublicPath('/api/posts')).toBe(false)
     expect(isPublicPath('/api/me')).toBe(false)

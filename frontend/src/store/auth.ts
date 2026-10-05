@@ -2,6 +2,7 @@ import type { AuthUser, LoginForm } from '@/api/auth'
 import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
 import * as authApi from '@/api/auth'
+import * as profileApi from '@/api/profile'
 // #ifndef H5
 import { cookieJar } from '@/http/cookie-jar'
 // #endif
@@ -48,6 +49,25 @@ export const useAuthStore = defineStore(
       return await fetchMe()
     }
 
+    /** 更新昵称，成功后重新拉取用户信息保持本地一致。 */
+    async function updateName(name: string): Promise<void> {
+      await profileApi.updateMyProfile({ name })
+      await fetchMe()
+    }
+
+    /** 换绑手机号（OTP 已在页面侧校验发送），成功后刷新用户信息。 */
+    async function changePhone(phone: string, code: string): Promise<void> {
+      await profileApi.verifyChangePhone(phone, code)
+      await fetchMe()
+    }
+
+    /** 上传头像文件并写入资料，成功后刷新用户信息。 */
+    async function updateAvatar(filePath: string): Promise<void> {
+      const url = await profileApi.uploadAvatar(filePath)
+      await profileApi.updateMyProfile({ image: url })
+      await fetchMe()
+    }
+
     /** 退出登录：通知后端清除会话，无论成败都清空本地用户。 */
     async function logout(): Promise<void> {
       try {
@@ -77,6 +97,9 @@ export const useAuthStore = defineStore(
       login,
       loginByPhoneOtp,
       loginByWechat,
+      updateName,
+      changePhone,
+      updateAvatar,
       logout,
       clear,
     }

@@ -83,8 +83,11 @@ const alovaInstance = createAlova({
   statesHook: VueHook,
 
   beforeRequest(method) {
+    // upload 走 multipart/form-data，Content-Type 需由 uni.uploadFile/浏览器自带 boundary，
+    // 这里不能指定 application/json，否则服务端无法解析表单
+    const isUpload = method.config.requestType === 'upload'
     method.config.headers = {
-      'Content-Type': 'application/json',
+      ...(isUpload ? {} : { 'Content-Type': 'application/json' }),
       'Accept': 'application/json, text/plain, */*',
       ...method.config.headers,
     }

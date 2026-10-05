@@ -1,11 +1,14 @@
 import {
   boolean,
+  integer,
+  jsonb,
   pgTable,
   primaryKey,
   text,
   timestamp
 } from 'drizzle-orm/pg-core'
 import { user } from './auth-schema'
+import type { MediaMetadata } from '../utils/media'
 
 /**
  * 业务表 + Better Auth 表统一出口。
@@ -50,6 +53,21 @@ export const userRole = pgTable(
   },
   t => [primaryKey({ columns: [t.userId, t.roleId] })]
 )
+
+/**
+ * 通用媒体表：COS 直传对象登记。
+ * 只有固定列 id/url/type/ref_count/metadata/created_at，其余属性放 metadata jsonb。
+ */
+export const mediaFile = pgTable('media_file', {
+  id: text('id')
+    .primaryKey()
+    .$defaultFn(() => crypto.randomUUID()),
+  url: text('url').notNull().unique(),
+  type: text('type').notNull(),
+  refCount: integer('ref_count').notNull().default(0),
+  metadata: jsonb('metadata').$type<MediaMetadata>().notNull().default({}),
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow()
+})
 
 // Better Auth 四张表
 export { account, session, user, verification } from './auth-schema'

@@ -19,7 +19,15 @@ const envSchema = z.object({
   WECHAT_APPID: z.string().optional(),
   WECHAT_SECRET: z.string().optional(),
   // 开发联调用：仅字符串 'true' 视为开启（不能用 z.coerce.boolean——它会把 'false' 也转成 true）
-  WECHAT_MOCK: z.string().default('false').transform(v => v === 'true')
+  WECHAT_MOCK: z.string().default('false').transform(v => v === 'true'),
+  // 腾讯云 COS（不配置不影响应用启动，仅调用媒体接口时报“对象存储未配置”）
+  TENCENT_COS_SECRET_ID: z.string().optional(),
+  TENCENT_COS_SECRET_KEY: z.string().optional(),
+  TENCENT_COS_BUCKET: z.string().optional(),
+  TENCENT_COS_REGION: z.string().default('ap-shanghai'),
+  // CDN/自定义访问域名（不含结尾斜杠）；为空时使用 COS 默认域名
+  TENCENT_COS_DOMAIN: z.string().optional(),
+  TENCENT_COS_STS_TTL: z.coerce.number().int().positive().max(7200).default(1800)
 })
 
 export type Env = z.infer<typeof envSchema>

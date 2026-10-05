@@ -152,7 +152,7 @@ const menuItems: HeaderMenuItem[] = [
         </view>
 
         <!-- 右部分：标题 -->
-        <text class="flex-1 ml-10 text-4 text-gray-900 font-medium">{{ title }}</text>
+        <text class="ml-10 flex-1 text-4 text-gray-900 font-medium">{{ title }}</text>
       </view>
     </view>
 

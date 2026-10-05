@@ -272,12 +272,15 @@ function onMockWechatLogin() {
     },
   })
 }
+function goBack() {
+  uni.navigateBack({ delta: 1 })
+}
 </script>
 
 <template>
   <view class="min-h-screen flex flex-col bg-gray-50 px-8 pt-safe">
     <view class="h-50px flex items-center justify-between px-3">
-      <view class="h-8 w-8 center rounded-full bg-gray-50 text-gray-600" @click="uni.navigateBack({ delta: 1 })">
+      <view class="h-8 w-8 center rounded-full bg-gray-50 text-gray-600" @click="goBack">
         <view class="i-carbon-arrow-left text-4" />
       </view>
     </view>

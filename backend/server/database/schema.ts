@@ -1,5 +1,4 @@
 import {
-  boolean,
   integer,
   jsonb,
   pgTable,
@@ -14,21 +13,6 @@ import type { MediaMetadata } from '../utils/media'
  * 业务表 + Better Auth 表统一出口。
  * 时间字段统一 timestamp with time zone。
  */
-
-// 示例资源：演示 auth + Zod + repository + 分页的标准 CRUD 模式
-export const post = pgTable('posts', {
-  id: text('id')
-    .primaryKey()
-    .$defaultFn(() => crypto.randomUUID()),
-  title: text('title').notNull(),
-  content: text('content').notNull().default(''),
-  published: boolean('published').notNull().default(false),
-  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
-  updatedAt: timestamp('updated_at', { withTimezone: true })
-    .notNull()
-    .defaultNow()
-    .$onUpdate(() => new Date())
-})
 
 // 轻量角色模型：name 为稳定英文码（admin/user），description 存中文友好名
 export const role = pgTable('role', {

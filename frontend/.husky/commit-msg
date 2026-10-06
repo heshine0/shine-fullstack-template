@@ -1,1 +1,9 @@
-npx --no-install commitlint --edit "$1"
+# 本仓库 git 根在 frontend 的上一级，钩子由 git 以仓库根为工作目录执行；
+# 先进入 frontend（钩子文件所在目录的上一级），否则找不到 node_modules 与配置
+cd "$(dirname "$0")/.." || exit 1
+
+# git 传入的提交信息文件路径可能是相对仓库根的，cd 后需还原为绝对路径
+msg_file="$1"
+[ -f "$msg_file" ] || msg_file="$(git rev-parse --show-toplevel)/$msg_file"
+
+npx --no-install commitlint --edit "$msg_file"

@@ -33,8 +33,8 @@ describe('isPublicPath', () => {
   })
 
   it('requires authentication for regular API paths', () => {
-    expect(isPublicPath('/api/posts')).toBe(false)
     expect(isPublicPath('/api/me')).toBe(false)
+    expect(isPublicPath('/api/media/register')).toBe(false)
     expect(isPublicPath('/api/admin/users')).toBe(false)
   })
 })

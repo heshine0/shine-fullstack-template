@@ -37,16 +37,16 @@ tongxiangwuxie/
 │  │  │  ├─ auth/[...].ts     #   Better Auth handler 挂载点 /api/auth/**
 │  │  │  ├─ admin/users/      #   用户管理（注意 [id]/roles.put.ts 目录嵌套）
 │  │  │  ├─ admin/roles/
-│  │  │  ├─ posts/  me.get.ts  health.get.ts
+│  │  │  ├─ me.get.ts  health.get.ts
 │  │  ├─ middleware/          # 00.request-id / 05.cors / 10.rate-limit / 20.auth
 │  │  ├─ plugins/error.ts     # 统一错误序列化钩子
 │  │  ├─ database/
-│  │  │  ├─ schema.ts         #   业务表（role / user_role / post 等）
+│  │  │  ├─ schema.ts         #   业务表（role / user_role / media_file 等）
 │  │  │  ├─ auth-schema.ts    #   Better Auth 的 user/session/account/verification
 │  │  │  ├─ client.ts         #   drizzle 客户端（带连接重试）
-│  │  │  ├─ repositories/     #   数据访问层（posts/users/roles）
+│  │  │  ├─ repositories/     #   数据访问层（users/roles/media）
 │  │  │  └─ seed.ts           #   幂等种子：内置角色 + 初始管理员
-│  │  ├─ schemas/             # Zod 入参校验（posts/users/roles）
+│  │  ├─ schemas/             # Zod 入参校验（users/roles/media）
 │  │  └─ utils/              # errors/response/pagination/validation/auth/logger/env
 │  ├─ drizzle/                # 生成的 SQL 迁移（0000_*.sql）
 │  ├─ scripts/migrate.ts      # 迁移执行入口

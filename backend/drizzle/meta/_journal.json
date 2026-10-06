@@ -15,6 +15,13 @@
       "when": 1791185843265,
       "tag": "0001_wide_golden_guardian",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1791280433688,
+      "tag": "0002_blue_red_hulk",
+      "breakpoints": true
     }
   ]
 }

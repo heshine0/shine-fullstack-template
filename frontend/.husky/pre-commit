@@ -1,1 +1,4 @@
+# 本仓库 git 根在 frontend 的上一级，钩子由 git 以仓库根为工作目录执行；
+# 先进入 frontend（钩子文件所在目录的上一级），否则找不到 node_modules 与配置
+cd "$(dirname "$0")/.." || exit 1
 npx lint-staged --allow-empty

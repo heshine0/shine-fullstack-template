@@ -1,3 +1,4 @@
+import type { AuthUser } from '@/api/auth'
 import type { CustomTabBarItem } from './types'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
@@ -36,12 +37,11 @@ const ADMIN_TAB_IS_HOME = [
   item('我的', 'pages/me/me'),
 ]
 
-async function setupStore(list: CustomTabBarItem[], userInfo?: { role?: string, roles?: string[] }) {
+async function setupStore(list: CustomTabBarItem[], roles?: string[]) {
   configState.list = list
-  const { useUserStore } = await import('@/store/user')
-  if (userInfo) {
-    useUserStore().setUserInfo({ userId: 1, username: 'u', nickname: 'U', ...userInfo })
-  }
+  const { useAuthStore } = await import('@/store/auth')
+  // AuthUser 必填字段较多，角色守卫只读 roles，这里用类型断言构造最小用户
+  useAuthStore().user = roles ? ({ roles } as AuthUser) : null
   return import('./store')
 }
 
@@ -57,17 +57,12 @@ describe('tabbarList 按 roles 过滤', () => {
   })
 
   it('roles 数组命中时，显示该项', async () => {
-    const { tabbarList } = await setupStore(ADMIN_TAB_IS_LAST, { roles: ['admin'] })
-    expect(tabbarList.value.map(i => i.text)).toEqual(['首页', '我的', '关于'])
-  })
-
-  it('单角色字段 role 命中时，同样显示该项', async () => {
-    const { tabbarList } = await setupStore(ADMIN_TAB_IS_LAST, { role: 'admin' })
+    const { tabbarList } = await setupStore(ADMIN_TAB_IS_LAST, ['admin'])
     expect(tabbarList.value.map(i => i.text)).toEqual(['首页', '我的', '关于'])
   })
 
   it('角色不匹配时，仍然隐藏该项', async () => {
-    const { tabbarList } = await setupStore(ADMIN_TAB_IS_LAST, { roles: ['user'] })
+    const { tabbarList } = await setupStore(ADMIN_TAB_IS_LAST, ['user'])
     expect(tabbarList.value.map(i => i.text)).toEqual(['首页', '我的'])
   })
 })
@@ -84,7 +79,7 @@ describe('curIdx 高亮', () => {
   })
 
   it('首页可见时，"/" 高亮到首页所在的下标', async () => {
-    const { tabbarStore, tabbarList } = await setupStore(ADMIN_TAB_IS_HOME, { roles: ['admin'] })
+    const { tabbarList, tabbarStore } = await setupStore(ADMIN_TAB_IS_HOME, ['admin'])
 
     tabbarStore.setAutoCurIdx('/')
 
@@ -92,15 +87,15 @@ describe('curIdx 高亮', () => {
   })
 
   it('角色变化导致可见项增减时，高亮跟随页面路径而不是下标', async () => {
-    const { tabbarStore, tabbarList } = await setupStore(ADMIN_TAB_IS_HOME)
+    const { tabbarList, tabbarStore } = await setupStore(ADMIN_TAB_IS_HOME)
 
     // 无角色：可见 [关于, 我的]，停在「我的」
     tabbarStore.setAutoCurIdx('/pages/me/me')
     expect(tabbarList.value[tabbarStore.curIdx].text).toBe('我的')
 
     // 登录成为 admin：可见变成 [首页, 关于, 我的]，仍然应该高亮「我的」
-    const { useUserStore } = await import('@/store/user')
-    useUserStore().setUserInfo({ userId: 1, username: 'u', nickname: 'U', roles: ['admin'] })
+    const { useAuthStore } = await import('@/store/auth')
+    useAuthStore().user = { roles: ['admin'] } as AuthUser
 
     expect(tabbarList.value.map(i => i.text)).toEqual(['首页', '关于', '我的'])
     expect(tabbarList.value[tabbarStore.curIdx].text).toBe('我的')
@@ -153,7 +148,7 @@ describe('getTabbarRedirectPath 运行时角色守卫', () => {
   })
 
   it('角色满足时放行', async () => {
-    const { getTabbarRedirectPath } = await setupStore(ADMIN_TAB_IS_LAST, { roles: ['admin'] })
+    const { getTabbarRedirectPath } = await setupStore(ADMIN_TAB_IS_LAST, ['admin'])
     expect(getTabbarRedirectPath('/pages/about/about')).toBe('')
   })
 

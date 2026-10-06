@@ -39,12 +39,6 @@ let baseURL = '/api'
 baseURL = `${import.meta.env.VITE_SERVER_BASEURL}/api`
 // #endif
 
-// 兼容模板：动态域名标记（DEFAULT 即当前基址；SECONDARY 来自环境变量）
-export const API_DOMAINS = {
-  DEFAULT: baseURL,
-  SECONDARY: import.meta.env.VITE_SERVER_BASEURL_SECONDARY,
-}
-
 // 防止并发 401 时重复跳转登录页
 let redirectingToLogin = false
 

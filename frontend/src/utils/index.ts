@@ -54,7 +54,6 @@ export function ensureDecodeURIComponent(url: string) {
  */
 export function parseUrlToObj(url: string) {
   const [path, queryStr] = url.split('?')
-  // console.log(path, queryStr)
 
   if (!queryStr) {
     return {
@@ -65,7 +64,6 @@ export function parseUrlToObj(url: string) {
   const query: Record<string, string> = {}
   queryStr.split('&').forEach((item) => {
     const [key, value] = item.split('=')
-    // console.log(key, value)
     query[key] = ensureDecodeURIComponent(value) // 这里需要统一 decodeURIComponent 一下，可以兼容h5和微信y
   })
   return { path, query }
@@ -138,11 +136,6 @@ export function getEnvBaseUrl() {
 
   return baseUrl
 }
-
-/**
- * 是否是双token模式
- */
-export const isDoubleTokenMode = import.meta.env.VITE_AUTH_MODE === 'double'
 
 /**
  * 首页路径，通过 page.json 里面的 type 为 home 的页面获取，如果没有，则默认是第一个页面

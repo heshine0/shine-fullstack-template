@@ -1,5 +1,4 @@
 <script setup lang="ts">
-// i-carbon-code
 import { customTabbarEnable, needHideNativeTabbar, tabbarCacheEnable } from './config'
 import { tabbarList, tabbarStore } from './store'
 import TabbarItem from './TabbarItem.vue'
@@ -67,9 +66,6 @@ onLoad(() => {
     fail(err) {
       console.log('hideTabBar fail: ', err)
     },
-    success(res) {
-      // console.log('hideTabBar success: ', res)
-    },
   })
 })
 // #endif
@@ -81,9 +77,6 @@ onMounted(() => {
   && uni.hideTabBar({
     fail(err) {
       console.log('hideTabBar fail: ', err)
-    },
-    success(res) {
-      // console.log('hideTabBar success: ', res)
     },
   })
 })

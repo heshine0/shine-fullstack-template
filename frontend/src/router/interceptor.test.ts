@@ -1,3 +1,4 @@
+import type { AuthUser } from '@/api/auth'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 /**
@@ -9,10 +10,10 @@ beforeEach(() => {
   vi.resetModules()
 })
 
-async function invoke(url: string, userInfo?: { roles?: string[] }) {
-  if (userInfo) {
-    const { useUserStore } = await import('@/store/user')
-    useUserStore().setUserInfo({ userId: 1, username: 'u', nickname: 'U', ...userInfo })
+async function invoke(url: string, roles?: string[]) {
+  if (roles) {
+    const { useAuthStore } = await import('@/store/auth')
+    useAuthStore().user = { roles } as AuthUser
   }
   const { navigateToInterceptor } = await import('./interceptor')
   return navigateToInterceptor.invoke({ url })
@@ -28,7 +29,7 @@ describe('navigateToInterceptor 角色守卫', () => {
   })
 
   it('角色满足时放行', async () => {
-    const result = await invoke('/pages/about/about', { roles: ['admin'] })
+    const result = await invoke('/pages/about/about', ['admin'])
 
     expect(result).not.toBe(false)
     expect(uni.reLaunch).not.toHaveBeenCalled()
@@ -93,7 +94,7 @@ describe('navigateToInterceptor 首页就是受限页（issue #454 的核心场�
   })
 
   it('角色满足时冷启动放行', async () => {
-    const result = await invoke('/', { roles: ['admin'] })
+    const result = await invoke('/', ['admin'])
 
     expect(result).not.toBe(false)
     expect(uni.reLaunch).not.toHaveBeenCalled()

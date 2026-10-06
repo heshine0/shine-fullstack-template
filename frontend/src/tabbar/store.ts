@@ -1,7 +1,6 @@
-import type { UserRole } from '@/api/types/login'
 import type { CustomTabBarItem, CustomTabBarItemBadge } from './types'
 import { computed, reactive, ref } from 'vue'
-import { useUserStore } from '@/store/user'
+import { useAuthStore } from '@/store/auth'
 import { HOME_PAGE } from '@/utils'
 
 import { tabbarList as _tabbarList, selectedTabbarStrategy, TABBAR_STRATEGY_MAP } from './config'
@@ -19,21 +18,13 @@ const baseTabbarList = reactive<CustomTabBarItem[]>(_tabbarList.map(item => ({
   pagePath: item.pagePath.startsWith('/') ? item.pagePath : `/${item.pagePath}`, // 统一成 '/' 开头的路径
 })))
 
-const userRoles = computed<UserRole[]>(() => {
-  const userStore = useUserStore()
-  // setup 语法的 pinia store 会自动解包 ref，这里必须直接取 userInfo，不能再取 .value
-  const userInfo = userStore.userInfo
-  if (Array.isArray(userInfo?.roles) && userInfo.roles.length > 0) {
-    return userInfo.roles
-  }
-  if (userInfo?.role) {
-    return [userInfo.role]
-  }
-  return []
+const userRoles = computed<string[]>(() => {
+  // 登录态事实源为 useAuthStore（Cookie 单通道）；用户角色由 GET /api/me 返回
+  return useAuthStore().user?.roles ?? []
 })
 
 /** item 不写 roles → 所有用户都能看到；写了 roles → 必须命中用户角色之一 */
-function hasRequiredRoles(item: CustomTabBarItem, roles: UserRole[]) {
+function hasRequiredRoles(item: CustomTabBarItem, roles: string[]) {
   if (!item.roles || item.roles.length === 0) {
     return true
   }

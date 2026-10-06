@@ -162,8 +162,8 @@ bun run dev:h5                        # http://localhost:9000
 
 ## 8. 前端开发约定（相对 unibest 模板的偏差，务必注意）
 
-1. **认证不是模板默认的 token/双 token 模式**。模板自带 `hermes/api.md`（双 token）、
-   `src/store/token.ts`、`src/http/http.ts` 仍在仓库中但**不是本项目链路**；
+1. **认证不是模板默认的 token/双 token 模式**。模板自带 `hermes/api.md`（双 token）
+   描述的是旧链路，`src/store/token.ts`、`src/http/http.ts` 等模板双 token 代码已删除；
    以 `src/http/alova.ts` + `src/store/auth.ts` 为唯一事实源：
    - beforeRequest **不注入 Authorization**，会话靠 Cookie（H5 同源自动携带）；
    - responded 解包 `{code:'OK', data}`，`code !== 'OK'` 抛错并 toast；
@@ -225,3 +225,23 @@ bun run test:run    # vitest run
 - frontend 的 unibest 模板规范：`frontend/AGENTS.md` 及其引用的 `frontend/hermes/*.md`
   （SFC 结构、平台条件编译、分包/发布等）；其中**认证/请求章节以本文件 §8 为准**。
 - 后端模板自带说明：`backend/README.md`（Nuxt 官方说明，业务约定以本文件 §7 为准）。
+
+## 13. 模板派生：品牌参数化脚本
+
+本仓库作为基础模板派生新项目时，**不要手工全局替换品牌字串**，统一用根目录脚本：
+
+```powershell
+bun scripts/init-template.mjs             # 交互式（回车保留默认值）
+bun scripts/init-template.mjs --dry-run   # 只预览，不落盘
+bun scripts/init-template.mjs --yes `
+  --title "某某协会" --slug my-app `
+  --uni-appid __UNI__XXX --wx-appid wxXXX --admin-email admin@example.com
+```
+
+- 参数：品牌中文名、英文 slug（数据库名/health 服务名）、uni-app 与微信 AppID、管理员邮箱。
+- 替换范围是脚本内**白名单文件**（前端 env/pages.config/页面与布局、后端 env 示例/后台页面/
+  drizzle.config/health、根 AGENTS.md）；env 按键名幂等赋值、源码做一次性字面量替换。
+  `.trae/` 历史文档、lockfile、二进制资产不处理。
+- 脚本结束会打印仍需手动处理的清单：应用图标、Android 权限、生产域名、`backend/.env`
+  密钥（BETTER_AUTH_SECRET/WECHAT/COS）、slug 变更后的建库与迁移、package.json 元信息、
+  LICENSE、git remote。

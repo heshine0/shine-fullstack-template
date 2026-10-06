@@ -68,6 +68,12 @@ export const useAuthStore = defineStore(
       await fetchMe()
     }
 
+    /** 以已上传完成的媒体 URL 写入头像，成功后刷新用户信息。 */
+    async function setAvatar(url: string): Promise<void> {
+      await profileApi.updateMyProfile({ image: url })
+      await fetchMe()
+    }
+
     /** 退出登录：通知后端清除会话，无论成败都清空本地用户。 */
     async function logout(): Promise<void> {
       try {
@@ -100,6 +106,7 @@ export const useAuthStore = defineStore(
       updateName,
       changePhone,
       updateAvatar,
+      setAvatar,
       logout,
       clear,
     }

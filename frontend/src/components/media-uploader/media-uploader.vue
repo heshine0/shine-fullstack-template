@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import type { MediaItem, MediaType } from '@/api/media'
-import { getMediaCredential, registerMedia } from '@/api/media'
-import { buildPostFormFields } from '@/utils/cos-post'
+import { uploadMedia } from '@/utils/upload-media'
 
 interface PendingSource {
   kind: 'h5' | 'mp'
@@ -21,11 +20,14 @@ const props = withDefaults(defineProps<{
   multiple?: boolean
   maxCount?: number
   disabled?: boolean
+  /** 裸模式：不渲染组件自带触发区与结果 UI，仅通过 expose 的 trigger() 与 change 事件工作。 */
+  bare?: boolean
 }>(), {
   modelValue: () => [],
   multiple: false,
   maxCount: undefined,
   disabled: false,
+  bare: false,
 })
 
 const emit = defineEmits<{
@@ -233,54 +235,16 @@ async function process(tempId: string) {
     return
 
   try {
-    const cred = await getMediaCredential({
-      type: props.type,
-      contentType: source.contentType,
-      size: source.size,
-      filename: source.name,
-    })
-
-    const fields = buildPostFormFields(cred.credential, cred.bucket, cred.key, source.contentType)
-    const uploadUrl = `https://${cred.bucket}.cos.${cred.region}.myqcloud.com`
-
-    await new Promise<void>((resolve, reject) => {
-      let task: ReturnType<typeof uni.uploadFile>
-      // #ifdef H5
-      task = uni.uploadFile({
-        url: uploadUrl,
-        name: 'file',
-        files: [{ name: 'file', file: source.file! }],
-        formData: fields,
-        success: res => (res.statusCode === 200 ? resolve() : reject(new Error(`HTTP ${res.statusCode}`))),
-        fail: err => reject(new Error(err.errMsg || '上传失败')),
-      })
-      // #endif
-      // #ifdef MP-WEIXIN
-      task = uni.uploadFile({
-        url: uploadUrl,
-        name: 'file',
-        filePath: source.path!,
-        formData: fields,
-        success: res => (res.statusCode === 200 ? resolve() : reject(new Error(`HTTP ${res.statusCode}`))),
-        fail: err => reject(new Error(err.errMsg || '上传失败')),
-      })
-      // #endif
-      task.onProgressUpdate((res) => {
-        const target = items.value.find(i => i.id === tempId)
-        if (target)
-          target.progress = res.progress
-      })
-    })
-
-    const row = await registerMedia({
-      key: cred.key,
-      metadata: {
-        name: source.name,
-        ...(source.width ? { width: source.width } : {}),
-        ...(source.height ? { height: source.height } : {}),
-        ...(source.duration ? { duration: source.duration } : {}),
+    const row = await uploadMedia(
+      { ...source, type: props.type },
+      {
+        onProgress: (progress) => {
+          const target = items.value.find(i => i.id === tempId)
+          if (target)
+            target.progress = progress
+        },
       },
-    })
+    )
 
     const idx = items.value.findIndex(i => i.id === tempId)
     if (idx >= 0) {
@@ -376,13 +340,21 @@ onUnmounted(() => {
   h5Input = null
   // #endif
 })
+
+// 供父组件以自定义触发器调用（如资料页点击头像行）
+defineExpose({
+  trigger: onTrigger,
+  reset: () => {
+    items.value = []
+  },
+})
 </script>
 
 <template>
   <view>
     <!-- 触发区 -->
     <view
-      v-if="canAdd"
+      v-if="!bare && canAdd"
       class="flex flex-col items-center justify-center gap-2 border border-gray-300 rounded-xl border-dashed px-6 py-8 dark:border-gray-700"
       @click="onTrigger"
     >
@@ -395,7 +367,7 @@ onUnmounted(() => {
 
     <!-- 图片网格 -->
     <view
-      v-if="type === 'image' && items.length"
+      v-if="!bare && type === 'image' && items.length"
       class="grid grid-cols-3 mt-4 gap-3"
     >
       <view
@@ -431,7 +403,7 @@ onUnmounted(() => {
     </view>
 
     <!-- 视频 -->
-    <view v-if="type === 'video'" class="mt-4 space-y-3">
+    <view v-if="!bare && type === 'video'" class="mt-4 space-y-3">
       <view
         v-for="(item, idx) in items"
         :key="item.id"
@@ -463,7 +435,7 @@ onUnmounted(() => {
     </view>
 
     <!-- 音频 -->
-    <view v-if="type === 'audio'" class="mt-4 space-y-2">
+    <view v-if="!bare && type === 'audio'" class="mt-4 space-y-2">
       <view
         v-for="item in items"
         :key="item.id"
@@ -500,7 +472,7 @@ onUnmounted(() => {
     </view>
 
     <!-- 文件列表 -->
-    <view v-if="type === 'file'" class="mt-4 space-y-2">
+    <view v-if="!bare && type === 'file'" class="mt-4 space-y-2">
       <view
         v-for="item in items"
         :key="item.id"

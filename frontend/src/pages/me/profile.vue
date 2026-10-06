@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import type { MediaItem } from '@/api/media'
 import { resolveMediaUrl, sendChangePhoneOtp } from '@/api/profile'
 import { useAuthStore } from '@/store/auth'
 import { toLoginPage } from '@/utils/toLoginPage'
@@ -27,48 +28,33 @@ onShow(() => {
     toLoginPage({ mode: 'reLaunch' })
 })
 
-// —— 头像 ——
-const uploading = ref(false)
+// —— 头像（复用通用媒体上传组件，直传 COS 后写入 image）——
+const avatarUploader = ref<{ trigger: () => void, reset: () => void } | null>(null)
+const savingAvatar = ref(false)
 
 function chooseAvatar() {
-  if (uploading.value)
+  if (savingAvatar.value)
     return
-  // #ifdef MP-WEIXIN
-  uni.chooseMedia({
-    count: 1,
-    mediaType: ['image'],
-    success: (res) => {
-      const file = res.tempFiles?.[0]
-      if (file?.tempFilePath)
-        void doUpload(file.tempFilePath)
-    },
-  })
-  // #endif
-  // #ifndef MP-WEIXIN
-  uni.chooseImage({
-    count: 1,
-    success: (res) => {
-      const path = res.tempFilePaths?.[0]
-      if (path)
-        void doUpload(path)
-    },
-  })
-  // #endif
+  avatarUploader.value?.trigger()
 }
 
-async function doUpload(filePath: string) {
-  uploading.value = true
-  uni.showLoading({ title: '上传中', mask: true })
+async function onAvatarChange(items: MediaItem[]) {
+  const file = items[0]
+  if (!file || file.status !== 'done')
+    return
+  savingAvatar.value = true
+  uni.showLoading({ title: '保存中', mask: true })
   try {
-    await auth.updateAvatar(filePath)
+    await auth.setAvatar(file.url)
     uni.showToast({ title: '头像已更新', icon: 'success' })
   }
   catch {
-    // 错误提示已由上传接口/响应拦截器统一弹出
+    // 错误提示已由响应拦截器统一弹出
   }
   finally {
-    uploading.value = false
+    savingAvatar.value = false
     uni.hideLoading()
+    avatarUploader.value?.reset()
   }
 }
 
@@ -228,6 +214,13 @@ async function handleConfirmPhone() {
         />
         <view class="i-carbon-chevron-right ml-2 text-4 text-gray-300" />
       </view>
+      <!-- 通用媒体上传组件：裸模式，仅复用其选择/直传/登记能力 -->
+      <media-uploader
+        ref="avatarUploader"
+        type="image"
+        bare
+        @change="onAvatarChange"
+      />
 
       <!-- 基础资料 -->
       <view class="mt-3 overflow-hidden rounded-3 bg-white shadow-sm">

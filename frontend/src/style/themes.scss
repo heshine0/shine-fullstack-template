@@ -1,0 +1,75 @@
+/**
+ * 主题变量（多主题切换的唯一事实源）
+ *
+ * 两条正交轴：
+ * 1. 外观模式：theme-light（默认） / theme-dark；mode=auto 时按系统主题解析为二者之一
+ * 2. 品牌主题：brand-default（默认武协绿） / brand-blue（商务蓝）
+ *
+ * 挂载方式（跨端）：
+ * - H5：class 挂在 <html>（document.documentElement），走 :root.xxx 选择器
+ * - 小程序/App：class 挂在 App.ku.vue 根 <view>，CSS 变量沿组件树继承，走 .xxx 类选择器
+ *
+ * 扩展新品牌：复制一组 brand 变量、在 store/theme.ts 的 ThemeBrand 联合类型与
+ * “我的”页品牌选项中各加一项即可，页面代码无需改动。
+ * 所有颜色只用 hex / 逗号分隔 rgba，避免 oklch 与空格分隔 rgb 在低端机不兼容。
+ */
+
+/* —— 默认：浅色模式 + default 品牌（同时作为未挂 class 时的兜底值） —— */
+:root,
+page {
+  --c-primary: #16a34a;
+  --c-primary-soft: #f0fdf4;
+  --c-primary-soft-text: #15803d;
+
+  --c-page: #f9fafb;
+  --c-card: #ffffff;
+  --c-hover: #f3f4f6;
+
+  --c-ink: #111827;
+  --c-sub: #4b5563;
+  --c-muted: #9ca3af;
+
+  --c-line: #f3f4f6;
+  --c-line-strong: #9ca3af;
+
+  --c-danger: #ef4444;
+  --c-danger-soft: #fef2f2;
+}
+
+/* —— 深色模式：只覆盖中性色，品牌主色也调亮以保证深底对比度 —— */
+:root.theme-dark,
+.theme-dark {
+  --c-primary: #22c55e;
+  --c-primary-soft: #14331f;
+  --c-primary-soft-text: #4ade80;
+
+  --c-page: #0f1115;
+  --c-card: #1a1d24;
+  --c-hover: #232730;
+
+  --c-ink: #e7eaf0;
+  --c-sub: #a7adba;
+  --c-muted: #6b7280;
+
+  --c-line: #2a2f3a;
+  --c-line-strong: #4b5563;
+
+  --c-danger: #f87171;
+  --c-danger-soft: #3b1d1d;
+}
+
+/* —— 品牌：商务蓝（浅色模式下的值） —— */
+:root.brand-blue,
+.brand-blue {
+  --c-primary: #0957de;
+  --c-primary-soft: #eff4ff;
+  --c-primary-soft-text: #0d47c9;
+}
+
+/* —— 深色 × 商务蓝：主色改用亮蓝 —— */
+:root.theme-dark.brand-blue,
+.theme-dark.brand-blue {
+  --c-primary: #4f8cff;
+  --c-primary-soft: #13233f;
+  --c-primary-soft-text: #93bcff;
+}

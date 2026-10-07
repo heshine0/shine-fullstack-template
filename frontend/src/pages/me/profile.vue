@@ -199,20 +199,20 @@ async function handleConfirmPhone() {
 </script>
 
 <template>
-  <view class="min-h-screen bg-gray-50 px-3 pt-3">
+  <view class="min-h-screen bg-page px-3 pt-3">
     <block v-if="auth.user">
       <!-- 头像 -->
       <view
-        class="flex items-center rounded-3 bg-white px-4 py-4 shadow-sm"
-        hover-class="bg-gray-50"
+        class="flex items-center rounded-3 bg-card px-4 py-4 shadow-sm"
+        hover-class="bg-hover"
         @click="chooseAvatar"
       >
-        <text class="text-4 text-gray-800">头像</text>
+        <text class="text-4 text-sub">头像</text>
         <image
           :src="avatarUrl"
-          class="ml-auto h-14 w-14 rounded-full bg-gray-100"
+          class="ml-auto h-14 w-14 rounded-full bg-hover"
         />
-        <view class="i-carbon-chevron-right ml-2 text-4 text-gray-300" />
+        <view class="i-carbon-chevron-right ml-2 text-4 text-muted" />
       </view>
       <!-- 通用媒体上传组件：裸模式，仅复用其选择/直传/登记能力 -->
       <media-uploader
@@ -223,37 +223,37 @@ async function handleConfirmPhone() {
       />
 
       <!-- 基础资料 -->
-      <view class="mt-3 overflow-hidden rounded-3 bg-white shadow-sm">
+      <view class="mt-3 overflow-hidden rounded-3 bg-card shadow-sm">
         <view
           class="flex items-center px-4 py-3.5"
-          hover-class="bg-gray-50"
+          hover-class="bg-hover"
           @click="editName"
         >
-          <text class="text-4 text-gray-800">昵称</text>
-          <text class="ml-auto block max-w-55 truncate text-4 text-gray-400">
+          <text class="text-4 text-sub">昵称</text>
+          <text class="ml-auto block max-w-55 truncate text-4 text-muted">
             {{ auth.user.name }}
           </text>
-          <view class="i-carbon-chevron-right ml-2 text-4 text-gray-300" />
+          <view class="i-carbon-chevron-right ml-2 text-4 text-muted" />
         </view>
 
         <view
-          class="flex items-center border-t border-gray-100 px-4 py-3.5"
-          hover-class="bg-gray-50"
+          class="flex items-center border-t border-line px-4 py-3.5"
+          hover-class="bg-hover"
           @click="openPhoneModal"
         >
-          <text class="text-4 text-gray-800">手机号</text>
-          <text class="ml-auto text-4 text-gray-400">
+          <text class="text-4 text-sub">手机号</text>
+          <text class="ml-auto text-4 text-muted">
             {{ phoneText || '未绑定' }}
           </text>
           <view
-            class="i-carbon-chevron-right ml-2 text-4 text-gray-300 transition-transform"
+            class="i-carbon-chevron-right ml-2 text-4 text-muted transition-transform"
             :class="editingPhone ? 'rotate-90' : ''"
           />
         </view>
 
-        <view class="flex items-center border-t border-gray-100 px-4 py-3.5">
-          <text class="text-4 text-gray-800">邮箱</text>
-          <text class="ml-auto block max-w-55 truncate text-4 text-gray-400">
+        <view class="flex items-center border-t border-line px-4 py-3.5">
+          <text class="text-4 text-sub">邮箱</text>
+          <text class="ml-auto block max-w-55 truncate text-4 text-muted">
             {{ auth.user.email || '—' }}
           </text>
         </view>
@@ -268,19 +268,19 @@ async function handleConfirmPhone() {
         @touchmove.stop.prevent
       >
         <view
-          class="w-full rounded-3 bg-white p-4 shadow-lg transition-all duration-200"
+          class="w-full rounded-3 bg-card p-4 shadow-lg transition-all duration-200"
           :class="phoneModalVisible ? 'scale-100 opacity-100' : 'scale-95 opacity-0'"
           @click.stop
         >
           <view class="mb-3 flex items-center">
-            <text class="text-4 text-gray-900 font-medium">更换手机号</text>
+            <text class="text-4 text-ink font-medium">更换手机号</text>
             <view
-              class="i-carbon-close ml-auto p-1 text-4 text-gray-400"
+              class="i-carbon-close ml-auto p-1 text-4 text-muted"
               @click="closePhoneModal"
             />
           </view>
-          <view class="mb-3 h-11 flex items-center overflow-hidden border border-gray-400 rounded-2 border-solid bg-white">
-            <view class="h-full flex items-center border-r border-gray-400 bg-gray-50 px-3 text-4 text-gray-700">
+          <view class="mb-3 h-11 flex items-center overflow-hidden border border-line-strong rounded-2 border-solid bg-card">
+            <view class="h-full flex items-center border-r border-line-strong bg-hover px-3 text-4 text-sub">
               +86
             </view>
             <input
@@ -297,12 +297,12 @@ async function handleConfirmPhone() {
               type="number"
               :maxlength="6"
               placeholder="请输入验证码"
-              class="h-11 flex-1 border border-gray-400 rounded-2 border-solid px-3 text-4"
+              class="h-11 flex-1 border border-line-strong rounded-2 border-solid px-3 text-4"
             >
             <button
               :disabled="countdown > 0 || sendingOtp"
               class="h-11 shrink-0 rounded-2 px-3 text-4"
-              :class="countdown > 0 || sendingOtp ? 'bg-gray-100 text-gray-400' : 'bg-green-50 text-green-700'"
+              :class="countdown > 0 || sendingOtp ? 'bg-hover text-muted' : 'bg-primary-soft text-primary-soft-text'"
               @click="handleSendOtp"
             >
               {{ countdown > 0 ? `${countdown}s 后重发` : '获取验证码' }}
@@ -310,7 +310,7 @@ async function handleConfirmPhone() {
           </view>
           <button
             :loading="submittingPhone"
-            class="h-11 w-full rounded-2 bg-green-600 text-4 text-white"
+            class="h-11 w-full rounded-2 bg-primary text-4 text-white"
             @click="handleConfirmPhone"
           >
             确认绑定

@@ -97,8 +97,39 @@ export default defineConfig({
   ],
   theme: {
     colors: {
-      /** 主题色，用法如: text-primary */
-      primary: 'var(--wot-color-theme,#0957DE)',
+      /**
+       * 语义化主题色，全部映射到 src/style/themes.scss 中的 CSS 变量。
+       * 页面只允许使用这些语义类（如 bg-page/bg-card/text-ink/bg-primary），
+       * 不要直接写死 gray-/green- 等调色板颜色，以便运行时切换主题。
+       * 注意：值是裸 var()，不支持 /透明度 修饰符，需要透明浅底用 *-soft 等独立 token。
+       */
+      primary: {
+        'DEFAULT': 'var(--c-primary)',
+        'soft': 'var(--c-primary-soft)',
+        'soft-text': 'var(--c-primary-soft-text)',
+      },
+      /** 页面窗口底色 */
+      page: 'var(--c-page)',
+      /** 卡片 / 导航栏 / tabbar 底色 */
+      card: 'var(--c-card)',
+      /** 按压态浅底 */
+      hover: 'var(--c-hover)',
+      /** 主文字 */
+      ink: 'var(--c-ink)',
+      /** 次要文字 */
+      sub: 'var(--c-sub)',
+      /** 最弱 / 占位文字 */
+      muted: 'var(--c-muted)',
+      line: {
+        /** 分割线、卡片描边 */
+        DEFAULT: 'var(--c-line)',
+        /** 输入框等强描边 */
+        strong: 'var(--c-line-strong)',
+      },
+      danger: {
+        DEFAULT: 'var(--c-danger)',
+        soft: 'var(--c-danger-soft)',
+      },
     },
     fontSize: {
       /** 提供更小号的字体，用法如：text-2xs */

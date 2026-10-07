@@ -5,6 +5,7 @@ import { navigateToInterceptor } from '@/router/interceptor'
 import { tabbarStore } from '@/tabbar/store'
 import { permission } from '@/router/permission'
 import { useAuthStore } from '@/store/auth'
+import { useThemeStore } from '@/store/theme'
 
 const { proxy } = (getCurrentInstance() || {}) as any
 const router = proxy?.$router
@@ -13,6 +14,8 @@ router && permission.install(router)
 
 onLaunch((options) => {
   console.log('App.vue onLaunch', options)
+  // 恢复持久化的主题选择并监听系统深浅色变化（H5 同步 class 到 documentElement）
+  useThemeStore().init()
   // 启动时用已有会话 Cookie 静默恢复登录态；未登录则安静停留在公开首页，
   // 进入受保护页或后续请求 401 时再引导登录。
   useAuthStore().fetchMe(true).catch(() => {})

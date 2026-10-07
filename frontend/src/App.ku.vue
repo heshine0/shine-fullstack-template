@@ -1,8 +1,12 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import FgTabbar from '@/tabbar/index.vue'
+import { useThemeStore } from '@/store/theme'
 import { isPageTabbar } from './tabbar/store'
 import { currRoute } from './utils'
+
+// 全局主题：根节点 class 承载 CSS 变量作用域（小程序/App 靠变量继承生效，H5 另同步 html）
+const themeStore = useThemeStore()
 
 const isCurrentPageTabbar = ref(true)
 onShow(() => {
@@ -27,7 +31,7 @@ defineExpose({
 </script>
 
 <template>
-  <view>
+  <view :class="themeStore.rootClass" class="min-h-screen bg-page">
     <!-- 这个先隐藏了，知道这样用就行 -->
     <view class="hidden text-center">
       {{ helloKuRoot }}，这里可以配置全局的东西

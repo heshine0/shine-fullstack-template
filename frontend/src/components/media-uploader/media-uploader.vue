@@ -355,14 +355,14 @@ defineExpose({
     <!-- 触发区 -->
     <view
       v-if="!bare && canAdd"
-      class="flex flex-col items-center justify-center gap-2 border border-gray-300 rounded-xl border-dashed px-6 py-8 dark:border-gray-700"
+      class="flex flex-col items-center justify-center gap-2 border border-line-strong rounded-xl border-dashed px-6 py-8"
       @click="onTrigger"
     >
-      <text class="i-carbon-cloud-upload text-28px text-gray-400" />
+      <text class="i-carbon-cloud-upload text-28px text-muted" />
       <text class="text-sm font-medium">
         {{ type === 'image' ? '上传图片' : type === 'video' ? '上传视频' : type === 'audio' ? '上传音频' : '上传文件' }}
       </text>
-      <text class="text-xs text-gray-400">{{ ui.hint }}</text>
+      <text class="text-xs text-muted">{{ ui.hint }}</text>
     </view>
 
     <!-- 图片网格 -->
@@ -374,7 +374,7 @@ defineExpose({
         v-for="item in items"
         :key="item.id"
         class="relative aspect-[4/3] overflow-hidden border rounded-lg"
-        :class="item.status === 'error' ? 'border-red-400' : 'border-gray-200 dark:border-gray-700'"
+        :class="item.status === 'error' ? 'border-danger' : 'border-line'"
       >
         <image
           v-if="item.status !== 'error'"
@@ -382,9 +382,9 @@ defineExpose({
           mode="aspectFill"
           class="h-full w-full"
         />
-        <view v-else class="h-full w-full flex flex-col items-center justify-center gap-1 bg-red-50 dark:bg-red-900/20">
-          <text class="i-carbon-warning-alt text-20px text-red-500" />
-          <text class="text-xs text-green-600 font-medium" @click="retry(item.id)">重试</text>
+        <view v-else class="h-full w-full flex flex-col items-center justify-center gap-1 bg-danger-soft">
+          <text class="i-carbon-warning-alt text-20px text-danger" />
+          <text class="text-xs text-primary font-medium" @click="retry(item.id)">重试</text>
         </view>
         <view
           v-if="item.status === 'uploading'"
@@ -397,7 +397,7 @@ defineExpose({
           class="absolute right-1 top-1 h-5 w-5 flex items-center justify-center rounded-full bg-white/90"
           @click.stop="removeItem(item.id)"
         >
-          <text class="i-carbon-close text-12px text-gray-600" />
+          <text class="i-carbon-close text-12px text-sub" />
         </view>
       </view>
     </view>
@@ -407,7 +407,7 @@ defineExpose({
       <view
         v-for="(item, idx) in items"
         :key="item.id"
-        class="overflow-hidden border border-gray-200 rounded-lg dark:border-gray-700"
+        class="overflow-hidden border border-line rounded-lg"
       >
         <video
           v-if="item.status !== 'error'"
@@ -416,18 +416,18 @@ defineExpose({
           class="w-full bg-black"
           style="height: 200px"
         />
-        <view v-else class="flex items-center justify-between gap-2 bg-red-50 px-3 py-4 dark:bg-red-900/20">
-          <text class="text-sm text-red-500">{{ item.errorMessage || '上传失败' }}</text>
-          <text class="text-xs text-green-600 font-medium" @click="retry(item.id)">重试</text>
+        <view v-else class="flex items-center justify-between gap-2 bg-danger-soft px-3 py-4">
+          <text class="text-sm text-danger">{{ item.errorMessage || '上传失败' }}</text>
+          <text class="text-xs text-primary font-medium" @click="retry(item.id)">重试</text>
         </view>
         <view class="flex items-center justify-between gap-2 px-3 py-2">
-          <text class="truncate text-xs text-gray-400">
+          <text class="truncate text-xs text-muted">
             {{ item.metadata.name }} · {{ formatSize(item.metadata.size)
             }}<template v-if="item.metadata.duration"> · {{ item.metadata.duration }}s</template>
           </text>
           <text
             v-if="!disabled"
-            class="i-carbon-trash-can text-16px text-gray-400"
+            class="i-carbon-trash-can text-16px text-muted"
             @click="removeItem(item.id)"
           />
         </view>
@@ -439,33 +439,32 @@ defineExpose({
       <view
         v-for="item in items"
         :key="item.id"
-        class="flex flex-wrap items-center gap-3 border border-gray-200 rounded-lg p-3 dark:border-gray-700"
+        class="flex flex-wrap items-center gap-3 border border-line rounded-lg p-3"
       >
         <template v-if="item.status !== 'error'">
-          <text class="i-carbon-music text-20px text-gray-400" />
+          <text class="i-carbon-music text-20px text-muted" />
           <view
-            class="h-8 w-8 flex items-center justify-center rounded-full bg-green-50 dark:bg-green-900/30"
+            class="h-8 w-8 flex items-center justify-center rounded-full bg-primary-soft"
             @click="togglePlay(item)"
           >
             <text
               :class="playingId === item.id ? 'i-carbon-pause-filled' : 'i-carbon-play-filled'"
-              class="text-16px"
-              style="color: #059669"
+              class="text-primary-soft-text text-16px"
             />
           </view>
         </template>
         <template v-else>
-          <text class="i-carbon-warning-alt text-20px text-red-500" />
-          <text class="flex-1 text-sm text-red-500">{{ item.errorMessage || '上传失败' }}</text>
-          <text class="text-xs text-green-600 font-medium" @click="retry(item.id)">重试</text>
+          <text class="i-carbon-warning-alt text-20px text-danger" />
+          <text class="flex-1 text-sm text-danger">{{ item.errorMessage || '上传失败' }}</text>
+          <text class="text-xs text-primary font-medium" @click="retry(item.id)">重试</text>
         </template>
-        <text class="ml-auto text-xs text-gray-400">
+        <text class="ml-auto text-xs text-muted">
           {{ item.metadata.name }} · {{ formatSize(item.metadata.size)
           }}<template v-if="item.metadata.duration"> · {{ item.metadata.duration }}s</template>
         </text>
         <text
           v-if="!disabled"
-          class="i-carbon-trash-can text-16px text-gray-400"
+          class="i-carbon-trash-can text-16px text-muted"
           @click="removeItem(item.id)"
         />
       </view>
@@ -478,16 +477,16 @@ defineExpose({
         :key="item.id"
         class="flex items-center gap-3 border rounded-lg px-3 py-2"
         :class="item.status === 'error'
-          ? 'border-red-400 bg-red-50 dark:bg-red-900/20'
-          : 'border-gray-200 dark:border-gray-700'"
+          ? 'border-danger bg-danger-soft'
+          : 'border-line'"
       >
         <text
-          :class="item.status === 'error' ? 'i-carbon-warning-alt text-red-500' : 'i-carbon-document text-gray-400'"
+          :class="item.status === 'error' ? 'i-carbon-warning-alt text-danger' : 'i-carbon-document text-muted'"
           class="text-20px"
         />
         <view class="min-w-0 flex-1">
           <text class="block truncate text-sm font-medium">{{ item.metadata.name || '未命名' }}</text>
-          <text class="text-xs text-gray-400">
+          <text class="text-xs text-muted">
             {{ formatSize(item.metadata.size) }}
             <template v-if="item.status === 'uploading'"> · 上传中 {{ item.progress ?? 0 }}%</template>
             <template v-else-if="item.status === 'error'"> · {{ item.errorMessage || '上传失败' }}</template>
@@ -495,14 +494,14 @@ defineExpose({
         </view>
         <text
           v-if="item.status === 'error'"
-          class="text-xs text-green-600 font-medium"
+          class="text-xs text-primary font-medium"
           @click="retry(item.id)"
         >
           重试
         </text>
         <text
           v-if="!disabled"
-          class="i-carbon-trash-can text-16px text-gray-400"
+          class="i-carbon-trash-can text-16px text-muted"
           @click="removeItem(item.id)"
         />
       </view>

@@ -116,43 +116,43 @@ const menuItems: HeaderMenuItem[] = [
 <template>
   <view class="min-h-screen flex flex-col">
     <!-- 自定义头部导航栏 -->
-    <view class="fixed left-0 right-0 top-0 z-[999] border-b border-gray-200 bg-white">
+    <view class="fixed left-0 right-0 top-0 z-[999] border-b border-line bg-card">
       <!-- 状态栏占位 -->
       <view :style="{ height: `${statusBarHeight}px` }" />
       <!-- 导航栏：左侧操作区 + 右侧标题 -->
       <view class="h-44px flex items-center justify-between px-3">
         <view class="flex items-center gap-2">
           <!-- tab 页：主页图标；非 tab 页：返回图标 -->
-          <view v-if="isTab" class="h-8 w-8 center rounded-full bg-gray-50 text-gray-600" @click="goHome">
+          <view v-if="isTab" class="h-8 w-8 center rounded-full bg-hover text-sub" @click="goHome">
             <view class="i-carbon-home text-4" />
           </view>
-          <view v-else class="h-8 w-8 center rounded-full bg-gray-50 text-gray-600" @click="goBack">
+          <view v-else class="h-8 w-8 center rounded-full bg-hover text-sub" @click="goBack">
             <view class="i-carbon-arrow-left text-4" />
           </view>
 
           <!-- 游客：登录按钮；已登录：用户图标 + 三条线 -->
           <view
             v-if="!auth.isLoggedIn"
-            class="rounded-full bg-green-50 px-3 py-1 text-3.5 text-green-700 font-medium"
+            class="text-primary-soft-text rounded-full bg-primary-soft px-3 py-1 text-3.5 font-medium"
             @click="toLoginPage()"
           >
             登录
           </view>
           <template v-else>
-            <view class="h-8 w-8 center rounded-full bg-gray-50 text-gray-600" @click="goMe">
+            <view class="h-8 w-8 center rounded-full bg-hover text-sub" @click="openMenu">
+              <view class="i-carbon-menu text-4" />
+            </view>
+            <view class="h-8 w-8 center rounded-full bg-hover text-sub" @click="goMe">
               <view class="i-carbon-user text-4" />
             </view>
-            <view class="h-8 w-8 center rounded-full bg-gray-50 text-gray-600" @click="showComingSoon">
+            <view class="h-8 w-8 center rounded-full bg-hover text-sub" @click="showComingSoon">
               <view class="i-carbon-notification text-4" />
-            </view>
-            <view class="h-8 w-8 center rounded-full bg-gray-50 text-gray-600" @click="openMenu">
-              <view class="i-carbon-menu text-4" />
             </view>
           </template>
         </view>
 
         <!-- 右部分：标题 -->
-        <text class="ml-10 flex-1 text-4 text-gray-900 font-medium">{{ title }}</text>
+        <text class="ml-10 flex-1 text-4 text-ink font-medium">{{ title }}</text>
       </view>
     </view>
 
@@ -165,15 +165,15 @@ const menuItems: HeaderMenuItem[] = [
     <template v-if="menuOpen">
       <view class="fixed inset-0 z-[1001]" @click="closeMenu" />
       <view
-        class="fixed left-3 z-[1002] w-130 overflow-hidden rounded-3 bg-white shadow-lg"
+        class="fixed left-3 z-[1002] w-130 overflow-hidden rounded-3 bg-card pb-4 shadow-lg"
         :style="{ top: `${headerTotalHeight + 4}px` }"
       >
         <view
           v-for="(item, index) in menuItems" :key="item.key"
           class="flex items-center px-4 py-2.5 text-3.5"
           :class="[
-            index > 0 ? 'border-t border-gray-100' : '',
-            item.danger ? 'bg-red-50 text-red-500' : 'text-gray-800',
+            index > 0 ? 'border-t border-line' : '',
+            item.danger ? ' text-danger' : 'text-sub',
           ]"
           @click="item.action"
         >

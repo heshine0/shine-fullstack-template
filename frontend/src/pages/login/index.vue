@@ -278,9 +278,9 @@ function goBack() {
 </script>
 
 <template>
-  <view class="min-h-screen flex flex-col bg-gray-50 px-8 pt-safe">
+  <view class="min-h-screen flex flex-col bg-page px-8 pt-safe">
     <view class="h-50px flex items-center justify-between px-3">
-      <view class="h-8 w-8 center rounded-full bg-gray-50 text-gray-600" @click="goBack">
+      <view class="h-8 w-8 center rounded-full bg-hover text-sub" @click="goBack">
         <view class="i-carbon-arrow-left text-4" />
       </view>
     </view>
@@ -291,7 +291,7 @@ function goBack() {
         mode="aspectFit"
         class="mx-auto mb-4 h-40 w-40"
       />
-      <view class="text-6 text-gray-900 font-bold">
+      <view class="text-6 text-ink font-bold">
         桐乡武协
       </view>
     </view>
@@ -302,7 +302,7 @@ function goBack() {
       <button
         v-if="wechatMock"
         :loading="wechatLoading"
-        class="h-11 rounded-2 bg-green-600 text-4 text-white"
+        class="h-11 rounded-2 bg-primary text-4 text-white"
         @click="onMockWechatLogin"
       >
         手机号快捷登录（Mock）
@@ -312,7 +312,7 @@ function goBack() {
         v-else
         open-type="getPhoneNumber"
         :loading="wechatLoading"
-        class="h-11 rounded-2 bg-green-600 text-4 text-white"
+        class="h-11 rounded-2 bg-primary text-4 text-white"
         @getphonenumber="onGetPhoneNumber"
       >
         手机号快捷登录
@@ -325,18 +325,18 @@ function goBack() {
     <!-- #endif -->
 
     <!-- 登录方式切换 -->
-    <view v-if="useOtherLogin" class="mb-8 rounded-4 bg-white shadow-sm">
+    <view v-if="useOtherLogin" class="mb-8 rounded-4 bg-card shadow-sm">
       <view class="flex p-4">
         <view
           class="h-9 flex flex-1 items-center justify-center rounded-1.5 text-4"
-          :class="tab === 'email' ? 'bg-green-600 text-white' : 'text-gray-500'"
+          :class="tab === 'email' ? 'bg-primary text-white' : 'text-muted'"
           @click="tab = 'email'"
         >
           邮箱密码
         </view>
         <view
           class="h-9 flex flex-1 items-center justify-center rounded-1.5 text-4"
-          :class="tab === 'phone' ? 'bg-green-600 text-white' : 'text-gray-500'"
+          :class="tab === 'phone' ? 'bg-primary text-white' : 'text-muted'"
           @click="tab = 'phone'"
         >
           手机验证码
@@ -347,32 +347,32 @@ function goBack() {
         <!-- 邮箱密码 -->
         <view v-if="tab === 'email'">
           <view class="mb-4">
-            <view class="mb-2 text-3.5 text-gray-600">
+            <view class="mb-2 text-3.5 text-sub">
               邮箱
             </view>
             <input
               v-model="email"
               type="text"
               placeholder="请输入邮箱"
-              class="h-11 border-gray-400 rounded-2 border-solid px-3 text-4"
+              class="h-11 border-line-strong rounded-2 border-solid px-3 text-4"
             >
           </view>
 
           <view class="mb-6">
-            <view class="mb-2 text-3.5 text-gray-600">
+            <view class="mb-2 text-3.5 text-sub">
               密码
             </view>
             <input
               v-model="password"
               password
               placeholder="请输入密码"
-              class="h-11 border-gray-400 rounded-2 border-solid px-3 text-4"
+              class="h-11 border-line-strong rounded-2 border-solid px-3 text-4"
             >
           </view>
 
           <button
             :loading="submitting"
-            class="h-11 rounded-2 bg-green-600 text-4 text-white"
+            class="h-11 rounded-2 bg-primary text-4 text-white"
             @click="handleEmailLogin"
           >
             登录
@@ -382,16 +382,16 @@ function goBack() {
         <!-- 手机号验证码 -->
         <view v-else>
           <view class="mb-4">
-            <view class="mb-2 text-3.5 text-gray-600">
+            <view class="mb-2 text-3.5 text-sub">
               手机号
             </view>
-            <view class="h-11 flex overflow-hidden border-gray-400 rounded-2 border-solid bg-white">
+            <view class="h-11 flex overflow-hidden border-line-strong rounded-2 border-solid bg-card">
               <view
-                class="h-full flex items-center gap-1 border-r border-gray-400 bg-gray-50 px-3 text-4 text-gray-700"
+                class="h-full flex items-center gap-1 border-r border-line-strong bg-hover px-3 text-4 text-sub"
                 @click="pickCountryCode"
               >
                 {{ countryCode }}
-                <text class="text-3 text-gray-400">▾</text>
+                <text class="text-3 text-muted">▾</text>
               </view>
               <input
                 v-model="phone"
@@ -404,7 +404,7 @@ function goBack() {
           </view>
 
           <view class="mb-6">
-            <view class="mb-2 text-3.5 text-gray-600">
+            <view class="mb-2 text-3.5 text-sub">
               验证码
             </view>
             <view class="flex items-center gap-3">
@@ -413,12 +413,12 @@ function goBack() {
                 type="number"
                 :maxlength="6"
                 placeholder="请输入验证码"
-                class="h-11 flex-1 border-gray-400 rounded-2 border-solid px-3 text-4"
+                class="h-11 flex-1 border-line-strong rounded-2 border-solid px-3 text-4"
               >
               <button
                 :disabled="countdown > 0 || sendingOtp"
                 class="h-11 shrink-0 rounded-2 px-3 text-4"
-                :class="countdown > 0 || sendingOtp ? 'bg-gray-100 text-gray-400' : 'bg-green-50 text-green-700'"
+                :class="countdown > 0 || sendingOtp ? 'bg-hover text-muted' : 'bg-primary-soft text-primary-soft-text'"
                 @click="handleSendOtp"
               >
                 {{ countdown > 0 ? `${countdown}s 后重发` : '获取验证码' }}
@@ -428,7 +428,7 @@ function goBack() {
 
           <button
             :loading="otpSubmitting"
-            class="h-11 rounded-2 bg-green-600 text-4 text-white"
+            class="h-11 rounded-2 bg-primary text-4 text-white"
             @click="handlePhoneLogin"
           >
             登录
@@ -441,16 +441,16 @@ function goBack() {
     <view class="mb-8 flex items-center justify-center gap-2 px-4">
       <view
         class="h-4 w-4 center shrink-0 rounded-0.5 border-solid"
-        :class="agreed ? 'border-green-600 bg-green-600 text-white' : 'border-gray-400 bg-white text-transparent'"
+        :class="agreed ? 'border-primary bg-primary text-white' : 'border-line-strong bg-card text-transparent'"
         @click="agreed = !agreed"
       >
         <text class="text-3 leading-none">✓</text>
       </view>
-      <text class="text-3 text-gray-500">
+      <text class="text-3 text-muted">
         我已阅读并同意
-        <text class="text-green-700" @click="showAgreement('terms')">《用户协议》</text>
+        <text class="text-primary-soft-text" @click="showAgreement('terms')">《用户协议》</text>
         与
-        <text class="text-green-700" @click="showAgreement('privacy')">《隐私政策》</text>
+        <text class="text-primary-soft-text" @click="showAgreement('privacy')">《隐私政策》</text>
       </text>
     </view>
   </view>

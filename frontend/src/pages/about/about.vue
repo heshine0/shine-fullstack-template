@@ -7,7 +7,7 @@ definePage({
 </script>
 
 <template>
-  <view class="mt-10 text-center text-green-500">
+  <view class="mt-10 text-center text-primary">
     关于页面
   </view>
 </template>

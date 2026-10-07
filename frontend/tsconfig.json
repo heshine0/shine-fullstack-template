@@ -1,6 +1,7 @@
 {
   "compilerOptions": {
     "composite": true,
+    "target": "ESNext",
     "lib": ["esnext", "dom"],
     "baseUrl": ".",
     "module": "esnext",

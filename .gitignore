@@ -45,3 +45,10 @@ logs/
 Thumbs.db
 .idea/
 .hbuilderx/
+
+# =====================
+# agent相关的文件
+# =====================
+/.agents/
+/skills-lock.json
+/.trae/

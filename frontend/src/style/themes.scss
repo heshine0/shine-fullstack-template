@@ -73,3 +73,74 @@ page {
   --c-primary-soft: #13233f;
   --c-primary-soft-text: #93bcff;
 }
+
+/* ============================================================
+ * wot-ui（wd-* 组件）语义变量桥接
+ *
+ * 把 wot 组件消费的 --wot-* 语义 token 指向本项目 --c-* 变量，
+ * 让 wd-* 组件跟随现有 浅/深 × 品牌 主题；调色板仍以本文件为唯一事实源。
+ *
+ * 右侧一律引用 var(--c-*)：品牌（brand-blue）切换时无需在此重复声明，
+ * --wot-primary-* 表达式中的 --c-primary 沿继承链取当前作用域的值，自动跟随。
+ *
+ * 作用域需直接命中 wd-config-provider 渲染的 .wot-theme-light/.wot-theme-dark
+ * 节点（其自带变量特异性 0,1,0），故用后代复合选择器（0,2,0）盖过；
+ * H5 弹层 teleport 到 body 后用 :root.theme-* .wd-root-portal 兜底。
+ *
+ * 注：此为初版映射，接入新 wot 组件若发现 variant 色差，在此微调档位即可。
+ * ============================================================ */
+@mixin wot-bridge-vars {
+  /* 主色：实心按钮/开关/选中态取 6，按下取 7，soft/plain 浅底取 1/2 */
+  --wot-primary-1: var(--c-primary-soft);
+  --wot-primary-2: var(--c-primary-soft);
+  --wot-primary-5: var(--c-primary);
+  --wot-primary-6: var(--c-primary);
+  --wot-primary-7: var(--c-primary-soft-text);
+
+  /* 危险色 */
+  --wot-danger-main: var(--c-danger);
+  --wot-danger-surface: var(--c-danger-soft);
+
+  /* 文字 */
+  --wot-text-main: var(--c-ink);
+  --wot-text-secondary: var(--c-sub);
+  --wot-text-auxiliary: var(--c-muted);
+  --wot-text-placeholder: var(--c-muted);
+
+  /* 图标 */
+  --wot-icon-main: var(--c-ink);
+  --wot-icon-secondary: var(--c-sub);
+  --wot-icon-auxiliary: var(--c-muted);
+  --wot-icon-placeholder: var(--c-muted);
+
+  /* 边框 */
+  --wot-border-extra-strong: var(--c-line-strong);
+  --wot-border-strong: var(--c-line-strong);
+  --wot-border-main: var(--c-line);
+  --wot-border-light: var(--c-line);
+
+  /* 填充：弹层/卡片用 oppo，页面底用 bottom，内容/按压灰用 content */
+  --wot-filled-oppo: var(--c-card);
+  --wot-filled-bottom: var(--c-page);
+  --wot-filled-content: var(--c-hover);
+
+  /* 分割线 */
+  --wot-divider-main: var(--c-line);
+  --wot-divider-light: var(--c-line);
+}
+
+/* 浅色：provider 节点 + H5 portal + 根/page 兜底 */
+:root,
+page,
+.theme-light .wot-theme-light,
+:root.theme-light .wd-root-portal {
+  @include wot-bridge-vars;
+}
+
+/* 深色：provider 节点（0,2,0）盖过其自带 .wot-theme-dark，H5 portal 命中根后代 */
+:root.theme-dark,
+.theme-dark,
+.theme-dark .wot-theme-dark,
+:root.theme-dark .wd-root-portal {
+  @include wot-bridge-vars;
+}

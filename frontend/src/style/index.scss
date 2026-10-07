@@ -1,5 +1,8 @@
+// wot-ui 基础色板 / 字体 / 圆角等底层 token（含 hex 兜底），@use 须置于文件最前
+@use '@wot-ui/ui/styles/theme/index.scss' as *;
+
 // 主题变量（浅/深模式 × 品牌主题），多主题切换的唯一事实源
-@import './themes.scss';
+@use './themes.scss' as *;
 
 // 测试用的 iconfont，可生效
 // @import './iconfont.css';
@@ -18,9 +21,6 @@ page {
   // 小程序端 page 自身不会随根 view 的 class 改变，由 App.ku 根节点满铺底色遮挡
   background-color: var(--c-page);
   color: var(--c-ink);
-
-  // 同步给 wot-design-uni 等以 --wot-color-theme 为主色变量的组件库
-  --wot-color-theme: var(--c-primary);
 }
 
 /*

@@ -37,7 +37,9 @@ defineExpose({
       {{ helloKuRoot }}，这里可以配置全局的东西
     </view>
 
-    <KuRootView />
+    <wd-config-provider :theme="themeStore.resolvedMode">
+      <KuRootView />
+    </wd-config-provider>
 
     <FgTabbar v-if="isCurrentPageTabbar" />
   </view>

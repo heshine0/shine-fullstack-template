@@ -18,7 +18,7 @@
 
 **backend**：Nuxt 4.5、Nuxt UI v4.11、Drizzle ORM 0.45（drizzle-kit 0.31）、postgres 驱动、PostgreSQL 18、Better Auth 1.7、Zod 4、Vitest 5、ESLint（@nuxt/eslint）。
 
-**frontend**：unibest 4.4 / uniapp（@dcloudio 3.0 alpha）、Vue 3.4、TypeScript 5.8、Vite 5、UnoCSS、Pinia 2 + pinia-plugin-persistedstate、alova 3 + @alova/adapter-uniapp、Vitest 3、ESLint（@uni-helper/eslint-config）。
+**frontend**：unibest 4.4 / uniapp（@dcloudio 3.0 alpha）、Vue 3.4、TypeScript 5.8、Vite 5、UnoCSS、wot-ui v2（@wot-ui/ui）、Pinia 2 + pinia-plugin-persistedstate、alova 3 + @alova/adapter-uniapp、Vitest 3、ESLint（@uni-helper/eslint-config）。
 
 ## 3. 目录结构（仅列关键项）
 
@@ -174,6 +174,19 @@ bun run dev:h5       # http://localhost:9000
    下用 `definePage({...})` 声明。
 3. 平台差异只用条件编译（`// #ifdef H5`）；样式优先 UnoCSS 原子类。
 4. 环境变量放在 `frontend/env/`（vite 的 `envDir` 已指向这里），且必须以 `VITE_` 开头。
+5. **组件库用 wot-ui v2（`@wot-ui/ui`），主题已与现有 `themes.scss` 主题体系融合，按以下约定：**
+   - `wd-*` 经 `pages.config.ts` 的 easycom 规则自动按需引入，**直接写标签，不要手动 import**；
+     不要安装/启用 `@wot-ui/unocss-preset`。
+   - 颜色**只走主题变量，不改库源码、不在页面硬编码 wot 色值**：`App.ku.vue` 已挂
+     `<wd-config-provider :theme="themeStore.resolvedMode">`，`src/style/themes.scss` 的
+     `@mixin wot-bridge-vars` 已把 `--wot-*` 语义 token 桥到 `var(--c-*)`，组件自动跟随
+     浅/深 × 品牌。接入新 wot 组件若某变体色差，只在该 mixin 内调档，右侧一律引用 `var(--c-*)`。
+   - v2 用 **`variant` 而非 v1 的 `plain` 布尔属性**（写旧属性会被静默忽略）：
+     `wd-button` variant = `base|plain|dashed|soft|subtle|text`；
+     `wd-tag` variant = `light|dark|plain|dashed|text`（默认即 dark 实心）。
+     props/事件以随包源码 `node_modules/@wot-ui/ui/components/wd-*/types.ts` 为准。
+   - `tsconfig.json` 的 types **不要加 `@wot-ui/ui/global`**（会令 vue-tsc 转译库内 `.vue`
+     源、刷出大量库类型错）；运行时类型由 easycom 解析，不依赖该全局入口。
 
 ## 9. Windows / PowerShell 注意事项
 

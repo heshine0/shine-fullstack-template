@@ -53,5 +53,14 @@ export const mediaFile = pgTable('media_file', {
   createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow()
 })
 
+/**
+ * 全局设置表：key/value 两列，value 为任意 JSON 值。
+ * 通过公开端点 GET /api/settings 对所有访客只读可见，勿存放密钥。
+ */
+export const setting = pgTable('setting', {
+  key: text('key').primaryKey(),
+  value: jsonb('value').$type<unknown>().notNull()
+})
+
 // Better Auth 四张表
 export { account, session, user, verification } from './auth-schema'

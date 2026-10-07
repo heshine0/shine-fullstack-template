@@ -16,7 +16,8 @@ const navItems = computed<NavItem[]>(() => [
   { label: '仪表盘', to: '/dashboard', icon: 'i-lucide-layout-dashboard' as unknown as Component },
   { label: '用户管理', to: '/admin/users', icon: 'i-lucide-users' as unknown as Component, adminOnly: true },
   { label: '角色管理', to: '/admin/roles', icon: 'i-lucide-shield-check' as unknown as Component, adminOnly: true },
-  { label: '媒体管理', to: '/admin/media', icon: 'i-lucide-images' as unknown as Component, adminOnly: true }
+  { label: '媒体管理', to: '/admin/media', icon: 'i-lucide-images' as unknown as Component, adminOnly: true },
+  { label: '设置管理', to: '/admin/settings', icon: 'i-lucide-settings' as unknown as Component, adminOnly: true }
 ])
 
 const visibleNav = computed(() => navItems.value.filter(i => !i.adminOnly || isAdmin.value))

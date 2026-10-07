@@ -25,6 +25,10 @@ export default defineConfig({
         'vertical-align': 'middle',
       },
       collections: {
+        // 显式注册 carbon 图标集（工厂函数动态导入），不依赖 preset-icons 运行时
+        // 按 cwd 探测 node_modules 的逻辑（该探测在 Bun 安装的依赖布局下会失败）。
+        'carbon': () =>
+          import('@iconify-json/carbon/icons.json').then(i => i.default),
         // 注册本地 SVG 图标集合, 从本地文件系统加载图标
         // 在 './src/static/my-icons' 目录下的所有 svg 文件将被注册为图标，
         // my-icons 是图标集合名称，使用 `i-my-icons-图标名` 调用

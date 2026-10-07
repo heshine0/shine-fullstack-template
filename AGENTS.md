@@ -8,7 +8,7 @@
 | 工程 | 目录 | 定位 | 包管理器（约束） |
 |------|------|------|------------------|
 | backend | `backend/` | Nuxt 4 全栈：REST API + 管理后台页面（SSR/SPA 混合） | **Bun 1.4.0**（安装与脚本一律用 `bun`） |
-| frontend | `frontend/` | unibest（uniapp + Vue3）多端应用，当前以 H5 联调为主 | **pnpm 安装依赖，Bun 运行脚本** |
+| frontend | `frontend/` | unibest（uniapp + Vue3）多端应用，当前以 H5 联调为主 | **Bun 1.4.0 全流程（安装依赖与脚本一律 bun）** |
 
 - 两工程各自拥有 `package.json` / lockfile / 配置，**没有 workspace、没有根 package.json**，不要在根目录执行安装。
 - 认证为 **Better Auth Cookie 单通道**：会话凭证是 HttpOnly Cookie，全链路不出现 token/Authorization 头。
@@ -69,7 +69,7 @@ tongxiangwuxie/
 
 ## 4. 环境准备
 
-1. **Bun 1.4.0** 与 **pnpm ≥ 9（实测 10.10）**。
+1. **Bun 1.4.0**（前后端统一：安装依赖与运行脚本一律用 `bun`，实测版本 1.4.0）。
 2. **PostgreSQL**：使用本地已有容器（名 `postgres`，镜像 `postgres:18-alpine`），
    连接串 `postgresql://postgres:postgres@127.0.0.1:5432/tongxiangwuxie`。
    **不要新建容器**；库不存在时手动 `CREATE DATABASE tongxiangwuxie;`。
@@ -90,10 +90,8 @@ bun run dev           # http://localhost:3000
 
 # —— 前端（另开终端）——
 cd frontend
-# 见 §9 说明：本环境需带两个 flag
-pnpm install --ignore-scripts --no-frozen-lockfile
-node ./scripts/create-base-files.js   # 生成 src/manifest.json、src/pages.json
-bun run dev:h5                        # http://localhost:9000
+bun install          # 生成 bun.lock；prepare/predev 钩子会生成 src/manifest.json、src/pages.json
+bun run dev:h5       # http://localhost:9000
 ```
 
 初始管理员账号不写入本文档；它由 `ADMIN_EMAIL` / `ADMIN_PASSWORD` 经 `bun run db:seed` 创建。
@@ -179,15 +177,14 @@ bun run dev:h5                        # http://localhost:9000
 
 ## 9. Windows / PowerShell 注意事项
 
-- PowerShell 不支持 `&&`，用 `;` 串联命令。
-- bun/pnpm 把进度写到 stderr，会被包成红色 CLIXML/NativeCommandError 噪音，**以退出码为准**。
-- 前端安装依赖：
-  - 本环境会被识别为 CI 而启用 frozen-lockfile，而模板自带 lockfile 与 package.json
-    不完全一致 → 需 `--no-frozen-lockfile`；
-  - `--ignore-scripts` 用于跳过模板 `prepare` 里的 `git init`（避免在 `frontend/`
-    产生嵌套 git 仓库）；跳过的副作用是 husky 未安装，改完代码请手动跑 §10 门禁。
-- pnpm 使用全局 store（如 `D:\.pnpm-store`）；若沙箱环境报 store 数据库写入受限，
-  在允许访问该目录的终端中执行安装即可。
+- PowerShell 不支持 `&&`，用 `;` 串联命令（`bun run` 的 package.json 脚本内部仍可用
+  `&&`，那是 Bun Shell 跨平台解析的，与外层终端无关）。
+- bun 把安装/运行进度写到 stderr，会被包成红色 CLIXML/NativeCommandError 噪音，**以退出码为准**。
+- 前端安装依赖直接 `bun install` 即可：Bun 默认提升依赖、自动安装 peer（等价 pnpm 的
+  shamefully-hoist/auto-install-peers），无需额外 flag；`prepare` 只做 husky 初始化与
+  生成物生成，不会再执行 `git init`。CI 或要求严格按锁文件安装时用 `bun install --frozen-lockfile`。
+- Bun 全局缓存默认在 `~/.bun/install/cache`；若沙箱环境报缓存目录写入受限，
+  在允许访问该目录的终端中执行安装，或设置 `BUN_INSTALL_CACHE_DIR` 到可写目录。
 - 诊断 HTTP 不要依赖 `Invoke-RestMethod`（非 2xx 会抛异常）；优先写临时 Bun/mjs
   脚本（fetch + 手动 cookie jar），用完删除。
 

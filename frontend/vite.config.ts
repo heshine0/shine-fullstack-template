@@ -44,12 +44,12 @@ export default defineConfig(({ command, mode }) => {
 
   // mode: 区分生产环境还是开发环境
   console.log('command, mode -> ', command, mode)
-  // pnpm dev:h5 时得到 => serve development
-  // pnpm build:h5 时得到 => build production
-  // pnpm dev:mp-weixin 时得到 => build development (注意区别，command为build)
-  // pnpm build:mp-weixin 时得到 => build production
-  // pnpm dev:app 时得到 => build development (注意区别，command为build)
-  // pnpm build:app 时得到 => build production
+  // bun run dev:h5 时得到 => serve development
+  // bun run build:h5 时得到 => build production
+  // bun run dev:mp-weixin 时得到 => build development (注意区别，command为build)
+  // bun run build:mp-weixin 时得到 => build production
+  // bun run dev:app 时得到 => build development (注意区别，command为build)
+  // bun run build:app 时得到 => build production
   // dev 和 build 命令可以分别使用 .env.development 和 .env.production 的环境变量
   // 非 H5 端 dev 也是 build command，最终加载哪个 env 文件以实际 mode 为准。
 

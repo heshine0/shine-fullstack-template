@@ -12,7 +12,7 @@ disable: false
 ## 项目背景
 
 - `backend/`：Nuxt 4 全栈（REST API + 管理后台），一律用 **Bun** 运行脚本，开发服务器默认监听 `:3000`。
-- `frontend/`：uni-app（unibest）客户端，用 **Bun** 运行脚本（依赖用 pnpm 安装），支持 H5（`bun run dev:h5`，固定端口 `:9000`）与微信小程序（`bun run dev:mp-weixin`）。
+- `frontend/`：uni-app（unibest）客户端，**Bun 1.4.0 全流程**（`bun install` 安装依赖，`bun run <script>` 运行脚本，勿用 pnpm/npm），支持 H5（`bun run dev:h5`，固定端口 `:9000`）与微信小程序（`bun run dev:mp-weixin`）。
 
 两个子项目互相独立，需分别启动。
 

@@ -25,11 +25,11 @@
 ## 常用命令
 
 ```bash
-pnpm dev            # H5 开发
-pnpm dev:mp         # 微信小程序开发
-pnpm dev:app        # APP 开发
-pnpm build:mp       # 微信小程序生产构建
-pnpm type-check     # vue-tsc 类型检查(合入前必过)
-pnpm lint:fix       # ESLint 修复
-pnpm test:run       # vitest 单次运行
+bun run dev:h5      # H5 开发
+bun run dev:mp      # 微信小程序开发
+bun run dev:app     # APP 开发
+bun run build:mp    # 微信小程序生产构建
+bun run type-check  # vue-tsc 类型检查(合入前必过)
+bun run lint:fix    # ESLint 修复
+bun run test:run    # vitest 单次运行
 ```

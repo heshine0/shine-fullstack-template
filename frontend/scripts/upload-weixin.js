@@ -2,11 +2,11 @@
  * 微信小程序 CLI 上传脚本
  *
  * 使用方法:
- *   pnpm upload:mp                                    # 版本号读取 package.json，描述使用最新 Git commit
- *   pnpm upload:mp --version=1.0.1                    # 指定版本号（覆盖 package.json）
- *   pnpm upload:mp --desc="修复bug"                   # 指定版本描述（覆盖 Git commit）
- *   pnpm upload:mp --robot=2                          # 指定机器人编号（1-30）
- *   pnpm upload:mp --version=2.0.0 --desc="重大更新"  # 组合使用多个参数
+ *   bun run upload:mp                                    # 版本号读取 package.json，描述使用最新 Git commit
+ *   bun run upload:mp --version=1.0.1                    # 指定版本号（覆盖 package.json）
+ *   bun run upload:mp --desc="修复bug"                   # 指定版本描述（覆盖 Git commit）
+ *   bun run upload:mp --robot=2                          # 指定机器人编号（1-30）
+ *   bun run upload:mp --version=2.0.0 --desc="重大更新"  # 组合使用多个参数
  *
  * 版本号策略: 命令行参数 > package.json version
  * 描述策略:   命令行参数 > Git 最新 commit > 默认时间戳
@@ -181,7 +181,7 @@ async function main() {
   // 构建小程序（跳过自动打开开发者工具）
   console.log('\n📦 正在构建小程序...（跳过自动打开开发者工具）\n')
   try {
-    execSync('pnpm build:mp:prod', {
+    execSync('bun run build:mp:prod', {
       cwd: ROOT_DIR,
       stdio: 'inherit',
       env: {

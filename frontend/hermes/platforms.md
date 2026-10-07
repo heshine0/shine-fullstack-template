@@ -58,10 +58,10 @@ VITE_SERVER_BASEURL__WEIXIN_RELEASE = 'https://prod.xxx.com'  # 正式版
 ## 5. 平台命令
 
 ```bash
-pnpm dev            # H5
-pnpm dev:mp         # 微信小程序(其余 dev:mp-alipay / mp-baidu / mp-jd / mp-kuaishou / mp-lark / mp-qq / mp-toutiao / mp-xhs 同理)
-pnpm dev:app        # APP(app-android / app-ios 可细分)
-pnpm build:mp       # 微信小程序生产构建
+bun run dev:h5      # H5
+bun run dev:mp      # 微信小程序(其余 dev:mp-alipay / mp-baidu / mp-jd / mp-kuaishou / mp-lark / mp-qq / mp-toutiao / mp-xhs 同理)
+bun run dev:app     # APP(app-android / app-ios 可细分)
+bun run build:mp    # 微信小程序生产构建
 ```
 
 新增平台特定行为时,同步更新本文第 3 节的差异点表。

@@ -33,15 +33,15 @@
 ## 5. Git 提交
 
 - commitlint 强制 conventional commits:`feat: / fix: / docs: / style: / refactor: / perf: / test: / chore:`
-- 版本发布走 changesets:`pnpm upload:changeset`
+- 版本发布走 changesets:`bun run upload:changeset`
 - husky 钩子已启用,lint-staged 会拦截不合规提交
 
 ## 6. 合入前验证(三条命令)
 
 ```bash
-pnpm type-check   # vue-tsc --noEmit,类型零错误
-pnpm lint         # eslint 零 error
-pnpm test:run     # vitest 全绿
+bun run type-check   # vue-tsc --noEmit,类型零错误
+bun run lint         # eslint 零 error
+bun run test:run     # vitest 全绿
 ```
 
-微信小程序上传:`pnpm upload:mp`(需 miniprogram-ci 配置)。
+微信小程序上传:`bun run upload:mp`(需 miniprogram-ci 配置)。

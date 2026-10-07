@@ -1,11 +1,10 @@
-FROM node:24-alpine AS builder
-RUN npm config set registry https://registry.npmmirror.com/
-RUN npm i -g corepack pnpm
+FROM oven/bun:1.4-alpine AS builder
 WORKDIR /app
+COPY package.json bun.lock ./
+RUN bun install --frozen-lockfile
 COPY . /app
-RUN pnpm install --frozen-lockfile
-RUN pnpm run init-baseFiles
-RUN pnpm run build:h5:prod
+RUN bun run init-baseFiles
+RUN bun run build:h5:prod
 RUN echo "Builder Success"
 
 FROM nginx:1.22-alpine

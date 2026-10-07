@@ -1,25 +1,25 @@
 # 开发工作流程
 
 ## 项目启动
-1. 安装依赖：`pnpm install`
+1. 安装依赖：`bun install`（本工程统一使用 Bun，勿用 pnpm/npm）
 2. 开发环境：
-   - H5: `pnpm dev` 或 `pnpm dev:h5`
-   - 微信小程序: `pnpm dev:mp`
-   - 支付宝小程序: `pnpm dev:mp-alipay`
-   - APP: `pnpm dev:app`
+   - H5: `bun run dev:h5` 或 `bun run dev`
+   - 微信小程序: `bun run dev:mp`
+   - 支付宝小程序: `bun run dev:mp-alipay`
+   - APP: `bun run dev:app`
 
 ## 代码规范
-- 使用 ESLint 进行代码检查：`pnpm lint`
-- 自动修复代码格式：`pnpm lint:fix`
+- 使用 ESLint 进行代码检查：`bun run lint`
+- 自动修复代码格式：`bun run lint:fix`
 - 使用 eslint 格式化代码
 - 遵循 TypeScript 严格模式
 
 ## 构建和部署
-- H5 构建：`pnpm build:h5`
-- 微信小程序构建：`pnpm build:mp`
-- 支付宝小程序构建：`pnpm build:mp-alipay`
-- APP 构建：`pnpm build:app`
-- 类型检查：`pnpm type-check`
+- H5 构建：`bun run build:h5`
+- 微信小程序构建：`bun run build:mp`
+- 支付宝小程序构建：`bun run build:mp-alipay`
+- APP 构建：`bun run build:app`
+- 类型检查：`bun run type-check`
 
 ## 开发工具
 - 推荐使用 VSCode 编辑器

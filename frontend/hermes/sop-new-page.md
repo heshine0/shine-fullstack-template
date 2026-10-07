@@ -13,7 +13,7 @@ definePage({
 </script>
 ```
 
-3. **跑 `pnpm type-check`**:重新生成 `src/types/uni-pages.d.ts`,路由类型才可用
+3. **跑 `bun run type-check`**:重新生成 `src/types/uni-pages.d.ts`,路由类型才可用
 
 注意:
 - 页面私有组件放同目录 `components/` 子目录(构建时已排除,**不会被识别成页面**)
@@ -42,7 +42,7 @@ definePage({
 ## 6. 验证清单(新建任何东西后)
 
 ```bash
-pnpm type-check   # 路由/组件类型生成且零错误
-pnpm lint         # 格式合规
-pnpm dev:mp       # 目标平台真机/模拟器跑一遍
+bun run type-check   # 路由/组件类型生成且零错误
+bun run lint         # 格式合规
+bun run dev:mp       # 目标平台真机/模拟器跑一遍
 ```

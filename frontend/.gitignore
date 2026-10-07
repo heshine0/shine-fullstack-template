@@ -4,7 +4,7 @@ logs
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
-pnpm-debug.log*
+bun-debug.log*
 lerna-debug.log*
 
 node_modules
@@ -33,8 +33,8 @@ src/types
 src/manifest.json
 src/pages.json
 
-# 2025-10-15 by 菲鸽： lock 文件还是需要加入版本管理，今天又遇到版本不一致导致无法运行的问题了。
-# pnpm-lock.yaml
+# lock 文件需要加入版本管理，避免版本不一致导致无法运行（本项目使用 bun.lock）。
+# bun.lock
 # package-lock.json
 
 # TIPS：如果某些文件已经加入了版本管理，现在重新加入 .gitignore 是不生效的，需要执行下面的操作

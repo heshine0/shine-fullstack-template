@@ -15,39 +15,29 @@
     "unibestUpdateTime": "2026-05-22",
     "createdAt": "2026-10-03 09:39:17"
   },
-  "packageManager": "pnpm@10.10.0",
+  "packageManager": "bun@1.4.0",
   "description": "unibest - 最好的 uniapp 开发模板",
   "generate-time": "用户创建项目时生成",
-  "author": {
-    "name": "feige996",
-    "zhName": "菲鸽",
-    "email": "1020103647@qq.com",
-    "github": "https://github.com/feige996",
-    "gitee": "https://gitee.com/feige996"
-  },
+
   "license": "MIT",
   "homepage": "https://unibest.tech",
   "repository": "https://github.com/feige996/unibest",
-  "bugs": {
-    "url": "https://github.com/feige996/unibest/issues",
-    "url-old": "https://github.com/codercup/unibest/issues"
-  },
   "engines": {
     "node": ">=20",
-    "pnpm": ">=9"
+    "bun": ">=1.4.0"
   },
   "scripts": {
     "openapi": "openapi-ts",
-    "init-husky": "git init && husky",
-    "init-baseFiles": "node ./scripts/create-base-files.js",
-    "prepare": "pnpm init-husky & pnpm init-baseFiles",
-    "predev": "pnpm init-baseFiles",
-    "predev:app": "pnpm init-baseFiles",
-    "predev:mp": "pnpm init-baseFiles",
-    "preinstall": "npx only-allow pnpm",
-    "uvm": "npx @dcloudio/uvm@latest",
-    "uvm-rm": "node ./scripts/postupgrade.js",
-    "bump-version": "node ./scripts/bump-version.js",
+    "init-husky": "cd .. && husky frontend/.husky",
+    "init-baseFiles": "bun ./scripts/create-base-files.js",
+    "prepare": "bun run init-husky && bun run init-baseFiles",
+    "predev": "bun run init-baseFiles",
+    "predev:app": "bun run init-baseFiles",
+    "predev:mp": "bun run init-baseFiles",
+    "preinstall": "node -e \"if(!(process.env.npm_config_user_agent||'').startsWith('bun')){console.error('\\\\n请使用 Bun 安装依赖：bun install\\\\n');process.exit(1)}\"",
+    "uvm": "bunx @dcloudio/uvm@latest",
+    "uvm-rm": "bun ./scripts/postupgrade.js",
+    "bump-version": "bun ./scripts/bump-version.js",
     "postuvm": "echo upgrade uni-app success!",
     "dev:app": "uni -p app",
     "dev:app:test": "uni -p app --mode test",
@@ -105,8 +95,8 @@
     "build:quickapp-webview": "uni build -p quickapp-webview",
     "build:quickapp-webview-huawei": "uni build -p quickapp-webview-huawei",
     "build:quickapp-webview-union": "uni build -p quickapp-webview-union",
-    "upload:changeset": "pnpm changeset && pnpm changeset version",
-    "upload:mp": "node ./scripts/upload-weixin.js",
+    "upload:changeset": "bun x changeset && bun x changeset version",
+    "upload:mp": "bun ./scripts/upload-weixin.js",
     "type-check": "vue-tsc --noEmit",
     "lint": "eslint",
     "lint:fix": "eslint --fix",
@@ -203,13 +193,14 @@
     "vue-tsc": "^3.0.6"
   },
   "overrides": {
-    "unconfig": "7.3.2"
-  },
-  "resolutions": {
     "bin-wrapper": "npm:bin-wrapper-china",
     "unconfig": "7.3.2"
   },
   "lint-staged": {
     "*": "echo 祝菲鸽身体健康"
-  }
+  },
+  "trustedDependencies": [
+    "@swc/core",
+    "@uni-helper/unocss-preset-uni"
+  ]
 }

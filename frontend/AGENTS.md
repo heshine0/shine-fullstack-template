@@ -43,12 +43,13 @@
 ## 常用命令
 
 ```bash
-pnpm dev          # H5
-pnpm dev:mp       # 微信小程序
-pnpm dev:app      # APP
-pnpm build:mp     # 微信小程序生产构建
-pnpm upload:mp    # 小程序上传(见 hermes/release.md)
+bun install       # 安装依赖（本工程统一使用 Bun，勿用 pnpm/npm）
+bun run dev:h5    # H5
+bun run dev:mp    # 微信小程序
+bun run dev:app   # APP
+bun run build:mp  # 微信小程序生产构建
+bun run upload:mp # 小程序上传(见 hermes/release.md)
 
 # 合入前门禁(三条全过)
-pnpm type-check && pnpm lint && pnpm test:run
+bun run type-check; bun run lint; bun run test:run   # PowerShell 用 ; 串联
 ```

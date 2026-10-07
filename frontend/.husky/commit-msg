@@ -6,4 +6,4 @@ cd "$(dirname "$0")/.." || exit 1
 msg_file="$1"
 [ -f "$msg_file" ] || msg_file="$(git rev-parse --show-toplevel)/$msg_file"
 
-npx --no-install commitlint --edit "$msg_file"
+bunx commitlint --edit "$msg_file"

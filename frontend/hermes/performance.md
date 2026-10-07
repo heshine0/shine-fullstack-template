@@ -19,7 +19,7 @@
 ## 3. 包体积日常检查
 
 ```bash
-pnpm build:h5   # H5 生产构建自动打开 visualizer 分析
+bun run build:h5   # H5 生产构建自动打开 visualizer 分析
 # 产物:node_modules/.cache/visualizer/stats.html
 ```
 

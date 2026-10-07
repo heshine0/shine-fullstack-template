@@ -49,7 +49,7 @@ src/
 ├── hooks/          # 组合式函数(auto-import,免 import)
 ├── tabbar/         # 底部导航(config.ts 为唯一配置源)
 ├── static/         # 静态资源(@img 别名指向 images 子目录)
-├── service/        # openapi 生成目录(`pnpm openapi`,eslint 忽略,勿手改)
+├── service/        # openapi 生成目录(`bun run openapi`,eslint 忽略,勿手改)
 └── types/          # 类型声明(大部分为生成物,见第 1 节)
 ```
 

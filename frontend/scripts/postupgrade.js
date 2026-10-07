@@ -1,4 +1,4 @@
-// # 执行 `pnpm upgrade` 后会升级 `uniapp` 相关依赖
+// # 执行 `bun update` 后会升级 `uniapp` 相关依赖
 // # 在升级完后，会自动添加很多无用依赖，这需要删除以减小依赖包体积
 // # 只需要执行下面的命令即可
 
@@ -46,7 +46,7 @@ function log(message, type = 'log') {
 async function uninstallDependency(dep) {
   try {
     log(`开始卸载依赖: ${dep}`)
-    const { stdout, stderr } = await execPromise(`pnpm un ${dep}`)
+    const { stdout, stderr } = await execPromise(`bun remove ${dep}`)
     if (stdout) {
       log(`stdout [${dep}]: ${stdout}`)
     }

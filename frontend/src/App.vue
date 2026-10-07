@@ -5,6 +5,7 @@ import { navigateToInterceptor } from '@/router/interceptor'
 import { tabbarStore } from '@/tabbar/store'
 import { permission } from '@/router/permission'
 import { useAuthStore } from '@/store/auth'
+import { useSettingsStore } from '@/store/settings'
 import { useThemeStore } from '@/store/theme'
 
 const { proxy } = (getCurrentInstance() || {}) as any
@@ -19,6 +20,8 @@ onLaunch((options) => {
   // 启动时用已有会话 Cookie 静默恢复登录态；未登录则安静停留在公开首页，
   // 进入受保护页或后续请求 401 时再引导登录。
   useAuthStore().fetchMe(true).catch(() => {})
+  // 启动必须加载全量设置（公开端点，无需登录）；失败静默，不阻断启动
+  useSettingsStore().fetchSettings().catch(() => {})
 })
 onShow((options) => {
   console.log('App.vue onShow', options)

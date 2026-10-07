@@ -32,6 +32,21 @@ describe('isPublicPath', () => {
     expect(isPublicPath('/api/uploadshook')).toBe(false)
   })
 
+  it('allows public settings reads at /api/settings', () => {
+    expect(isPublicPath('/api/settings')).toBe(true)
+    expect(isPublicPath('/api/settings/site.title')).toBe(true)
+  })
+
+  it('does not treat sibling prefixes of /api/settings as public', () => {
+    expect(isPublicPath('/api/settings-secret')).toBe(false)
+    expect(isPublicPath('/api/settingshook')).toBe(false)
+  })
+
+  it('keeps admin settings endpoints authenticated despite the public prefix', () => {
+    expect(isPublicPath('/api/admin/settings')).toBe(false)
+    expect(isPublicPath('/api/admin/settings/site.title')).toBe(false)
+  })
+
   it('requires authentication for regular API paths', () => {
     expect(isPublicPath('/api/me')).toBe(false)
     expect(isPublicPath('/api/media/register')).toBe(false)

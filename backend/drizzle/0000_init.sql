@@ -14,13 +14,14 @@ CREATE TABLE "account" (
 	"updated_at" timestamp with time zone DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
-CREATE TABLE "posts" (
+CREATE TABLE "media_file" (
 	"id" text PRIMARY KEY NOT NULL,
-	"title" text NOT NULL,
-	"content" text DEFAULT '' NOT NULL,
-	"published" boolean DEFAULT false NOT NULL,
+	"url" text NOT NULL,
+	"type" text NOT NULL,
+	"ref_count" integer DEFAULT 0 NOT NULL,
+	"metadata" jsonb DEFAULT '{}'::jsonb NOT NULL,
 	"created_at" timestamp with time zone DEFAULT now() NOT NULL,
-	"updated_at" timestamp with time zone DEFAULT now() NOT NULL
+	CONSTRAINT "media_file_url_unique" UNIQUE("url")
 );
 --> statement-breakpoint
 CREATE TABLE "role" (

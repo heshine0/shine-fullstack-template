@@ -5,22 +5,8 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1790944753704,
-      "tag": "0000_brief_smasher",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "7",
-      "when": 1791185843265,
-      "tag": "0001_wide_golden_guardian",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "7",
-      "when": 1791280433688,
-      "tag": "0002_blue_red_hulk",
+      "when": 1791354216221,
+      "tag": "0000_init",
       "breakpoints": true
     }
   ]

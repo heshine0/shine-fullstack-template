@@ -1,7 +1,7 @@
 import { hashPassword } from 'better-auth/crypto'
-import { listRoles } from '../../../database/repositories/roles'
 import { createUserWithRoles, getUserByEmail, getUserByPhone } from '../../../database/repositories/users'
 import { userCreateBodySchema } from '../../../schemas/users'
+import { getCachedRolesList } from '../../../utils/roles-cache'
 
 /**
  * 管理员创建用户（admin）。
@@ -20,7 +20,7 @@ export default defineEventHandler(async (event) => {
   }
 
   const desiredRoles = body.roles && body.roles.length ? [...new Set(body.roles)] : [DEFAULT_USER_ROLE]
-  const validNames = new Set((await listRoles()).map(r => r.name))
+  const validNames = new Set((await getCachedRolesList()).map(r => r.name))
   const invalid = desiredRoles.filter(name => !validNames.has(name))
   if (invalid.length) {
     throw createApiError('VALIDATION_ERROR', {

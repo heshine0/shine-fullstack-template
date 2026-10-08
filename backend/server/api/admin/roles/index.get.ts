@@ -1,4 +1,4 @@
-import { listRoles } from '../../../database/repositories/roles'
+import { getCachedRolesList } from '../../../utils/roles-cache'
 
-/** 角色列表（admin）。 */
-export default defineEventHandler(async () => ok(await listRoles()))
+/** 角色列表（admin，缓存优先）。 */
+export default defineEventHandler(async () => ok(await getCachedRolesList()))

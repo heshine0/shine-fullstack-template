@@ -1,5 +1,6 @@
 import { getRoleById, roleExists, updateRole } from '../../../database/repositories/roles'
 import { roleIdParamSchema, roleUpdateBodySchema } from '../../../schemas/roles'
+import { invalidateRolesListCache } from '../../../utils/roles-cache'
 
 const BUILTIN_ROLE_NAMES = [ADMIN_ROLE, DEFAULT_USER_ROLE]
 
@@ -19,5 +20,7 @@ export default defineEventHandler(async (event) => {
   }
 
   const updated = await updateRole(id, body)
+  // 角色改名后，各用户 user-roles 缓存依赖短 TTL（120s）自然过期
+  await invalidateRolesListCache()
   return ok(updated)
 })

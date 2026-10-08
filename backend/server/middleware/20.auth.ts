@@ -1,5 +1,6 @@
 import type { SessionUser } from '../utils/auth-context'
-import { ADMIN_ROLE, auth, getUserRoleNames } from '../utils/auth'
+import { ADMIN_ROLE, auth } from '../utils/auth'
+import { getCachedUserRoleNames } from '../utils/roles-cache'
 import { isPublicPath } from '../utils/path'
 
 /**
@@ -27,7 +28,7 @@ export default defineEventHandler(async (event) => {
   const sessionUser = result.user as SessionUser
   if (sessionUser.banned) throw createApiError('FORBIDDEN', { message: '账号已被停用' })
 
-  const roles = await getUserRoleNames(sessionUser.id)
+  const roles = await getCachedUserRoleNames(sessionUser.id)
   event.context.user = sessionUser
   event.context.session = result.session
   event.context.roles = roles

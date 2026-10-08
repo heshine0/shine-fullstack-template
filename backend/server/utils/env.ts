@@ -27,7 +27,13 @@ const envSchema = z.object({
   TENCENT_COS_REGION: z.string().default('ap-shanghai'),
   // CDN/自定义访问域名（不含结尾斜杠）；为空时使用 COS 默认域名
   TENCENT_COS_DOMAIN: z.string().optional(),
-  TENCENT_COS_STS_TTL: z.coerce.number().int().positive().max(7200).default(1800)
+  TENCENT_COS_STS_TTL: z.coerce.number().int().positive().max(7200).default(1800),
+  // 缓存：存储介质 memory（进程内，默认）| redis（共享缓存，需 CACHE_REDIS_URL）
+  CACHE_DRIVER: z.enum(['memory', 'redis']).default('memory'),
+  CACHE_REDIS_URL: z.string().optional(),
+  // 默认过期时间（秒）与 key 前缀（多应用共用同一 Redis 时隔离）
+  CACHE_TTL: z.coerce.number().int().positive().default(300),
+  CACHE_KEY_PREFIX: z.string().default('app')
 })
 
 export type Env = z.infer<typeof envSchema>

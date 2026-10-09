@@ -21,6 +21,8 @@ interface ImportMetaEnv {
   readonly VITE_SERVER_BASEURL__WEIXIN_TRIAL?: string
   /** 微信小程序正式版后台接口地址，不配置则使用 VITE_SERVER_BASEURL */
   readonly VITE_SERVER_BASEURL__WEIXIN_RELEASE?: string
+  /** web-view 免登录管理后台页面基址，不配置时代码回退 getEnvBaseUrl() */
+  readonly VITE_ADMIN_WEB_URL?: string
   /** H5是否需要代理 */
   readonly VITE_APP_PROXY_ENABLE: 'true' | 'false'
   /** H5是否需要代理，需要的话有个前缀 */

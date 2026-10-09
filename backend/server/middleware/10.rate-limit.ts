@@ -29,6 +29,8 @@ function isSensitiveEndpoint(pathname: string, method: string): boolean {
     || pathname === '/api/auth/phone-number/send-otp'
     || pathname === '/api/auth/phone-number/verify'
     || pathname === '/api/auth/wechat/phone-sign-in'
+    // 小程序 web-view 一次性票据兑换：匿名可访问，按敏感端点限流防爆破
+    || pathname === '/api/auth/one-time-token/verify'
     || (pathname === '/api/admin/users' && method === 'POST')
   )
 }

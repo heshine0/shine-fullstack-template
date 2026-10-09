@@ -71,6 +71,17 @@ export function loginWithWechatPhone(phoneCode: string): Promise<unknown> {
 }
 
 /**
+ * 生成 web-view 免登录一次性票据：GET /api/auth/one-time-token/generate。
+ * Better Auth one-time-token 插件：需携带当前会话 Cookie，返回 60s 有效的一次性 token
+ * （服务端只存 SHA-256）；供小程序拼进后台 /sso-login 落地页 URL 兑换 Cookie 会话。
+ */
+export function generateOneTimeToken(): Promise<{ token: string }> {
+  return http.Get('/auth/one-time-token/generate', {
+    meta: { rawAuth: true },
+  }) as unknown as Promise<{ token: string }>
+}
+
+/**
  * 获取当前登录用户（GET /api/me，拦截器已解包 data，含 roles）。
  * @param silent 静默模式：401 时不弹提示、不跳转登录页（用于启动时探测会话）。
  */

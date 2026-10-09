@@ -52,15 +52,19 @@ bun run dev:h5       # http://localhost:9000
 
 ## 4. 本地联调架构（重要）
 
-- 后端固定 **3000**，前端 H5 固定 **9000**。
+- 后端默认端口 **3000**（`backend/.env` 的 `PORT`），前端 H5 默认 **9000**
+  （`env/.env` 的 `VITE_APP_PORT`）；两者可用根目录 `scripts/init-template.mjs`
+  的 `--backend-port` / `--frontend-port` 一次性同步修改（含本工程代理目标）。
 - `vite.config.ts` 的 devServer 代理：键 `VITE_APP_PROXY_PREFIX`（默认 `/api`）
   → 目标 `VITE_SERVER_BASEURL`（`http://localhost:3000`），`changeOrigin: true`，
   **不做路径 rewrite**（后端路由本身含 `/api` 前缀，含 Better Auth 的 `/api/auth/*`）。
 - 开关在 `env/.env.development`：`VITE_APP_PROXY_ENABLE=true`、`VITE_APP_PROXY_PREFIX=/api`。
 - 非 H5 端（小程序/App）没有 vite 代理：`src/http/alova.ts` 用条件编译把 baseURL
   切为 `${VITE_SERVER_BASEURL}/api` 直连（跨域 Cookie 需后端 CORS + 凭证支持）。
-- H5 浏览器登录验证必须落在标准端口 **9000**：Better Auth 自带 trusted-origin 校验；
-  dev 跑在 9001 等非标准端口时，POST `/api/auth/sign-in/email` 会带非预期 Origin 被 403。
+- H5 浏览器登录验证的端口必须与后端 `TRUSTED_ORIGINS` 登记一致（模板默认 **9000**）：
+  Better Auth 自带 trusted-origin 校验；dev 跑在未登记的端口（如 9001）时，
+  POST `/api/auth/sign-in/email` 会带非预期 Origin 被 403。改端口请走 init 脚本，
+  它会同步 `VITE_APP_PORT` 与后端 `TRUSTED_ORIGINS`。
 
 ## 5. 本项目开发约定（相对 unibest 模板的偏差，务必注意）
 
@@ -91,6 +95,13 @@ bun run dev:h5       # http://localhost:9000
      props/事件以随包源码 `node_modules/@wot-ui/ui/components/wd-*/types.ts` 为准。
    - `tsconfig.json` 的 types **不要加 `@wot-ui/ui/global`**（会令 vue-tsc 转译库内 `.vue`
      源、刷出大量库类型错）；运行时类型由 easycom 解析，不依赖该全局入口。
+6. **web-view 免登录管理后台**：入口在「我的」页 → `/pages/webview/admin/index`；页面 onLoad
+   调 `generateOneTimeToken()`（`src/api/auth.ts`，GET `/auth/one-time-token/generate`，
+   rawAuth）取 60s 一次性票据，拼 `${VITE_ADMIN_WEB_URL}/sso-login#ott=...&redirect=/dashboard`
+   给 `<web-view>`，后台落地页兑换成 Cookie 会话。`VITE_ADMIN_WEB_URL` 缺省回退
+   `getEnvBaseUrl()`（含微信 develop/trial/release 覆写）。生产须 HTTPS 且在小程序后台配置
+   「业务域名」；开发者工具联调勾选「不校验合法域名」，真机用电脑局域网 IP。
+   web-view 与小程序**共享同一条 Better Auth session**（任一端退出会同时失效）。
 
 ## 6. Windows / PowerShell 注意事项
 
@@ -139,9 +150,10 @@ bun ../scripts/init-template.mjs --yes `
 
 （脚本位于仓库根 `scripts/init-template.mjs`，路径以脚本自身位置为基准，在任一目录下执行均可。）
 
-- 参数：品牌中文名、英文 slug（数据库名/health 服务名）、uni-app 与微信 AppID、管理员邮箱。
+- 参数：品牌中文名、英文 slug（数据库名/health 服务名）、uni-app 与微信 AppID、管理员邮箱、
+  后端/前端开发端口（`--backend-port` / `--frontend-port`，默认 3000 / 9000）。
 - 替换范围是脚本内**白名单文件**（前端 env/pages.config/页面与布局、后端 env 示例/后台页面/
-  drizzle.config/health、根 AGENTS.md）；env 按键名幂等赋值、源码做一次性字面量替换。
+  drizzle.config/health、根及两个子工程的 AGENTS.md）；env 按键名幂等赋值、源码做一次性字面量替换。
   `.trae/` 历史文档、lockfile、二进制资产不处理。
 - 脚本结束会打印仍需手动处理的清单：应用图标、Android 权限、生产域名、`backend/.env`
   密钥（BETTER_AUTH_SECRET/WECHAT/COS）、slug 变更后的建库与迁移、package.json 元信息、

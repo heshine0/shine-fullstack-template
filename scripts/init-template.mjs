@@ -8,7 +8,8 @@
  *   bun scripts/init-template.mjs --yes \         非交互（CI / 脚本化）
  *     --title "某某协会" --slug my-association \
  *     --uni-appid __UNI__XXXX --wx-appid wxXXXX \
- *     --admin-email admin@example.com
+ *     --admin-email admin@example.com \
+ *     --backend-port 3000 --frontend-port 9000
  *   bun scripts/init-template.mjs --help
  *
  * 设计说明：
@@ -29,6 +30,8 @@ const DEFAULTS = {
   uniAppid: '__UNI__D1E5001', // uni-app AppID
   wxAppid: 'wxa2abb91f64032a2b', // 微信小程序 AppID
   adminEmail: 'admin@tongxiangwuxie.local', // 初始管理员邮箱（同时是登录页预填值）
+  backendPort: 3000, // 后端开发端口（nuxt dev：backend/.env 的 PORT）
+  frontendPort: 9000, // 前端 H5 开发端口（vite devServer：VITE_APP_PORT）
 }
 
 // 需要做字面量替换的源码/配置文件（相对仓库根）。顺序即替换顺序，长串在前。
@@ -45,6 +48,8 @@ const TEXT_FILES = [
   'backend/drizzle.config.ts',
   'backend/server/api/health.get.ts',
   'AGENTS.md',
+  'backend/AGENTS.md',
+  'frontend/AGENTS.md',
 ]
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..')
@@ -82,6 +87,8 @@ const HELP = `品牌参数化脚本
   --uni-appid <AppID>    uni-app AppID（默认：${DEFAULTS.uniAppid}）
   --wx-appid <AppID>     微信小程序 AppID（默认：${DEFAULTS.wxAppid}）
   --admin-email <邮箱>   初始管理员邮箱（默认：${DEFAULTS.adminEmail}）
+  --backend-port <端口>  后端开发端口（默认：${DEFAULTS.backendPort}）
+  --frontend-port <端口> 前端 H5 开发端口（默认：${DEFAULTS.frontendPort}）
   --dry-run              只预览改动，不写文件
   --yes                  非交互模式（参数需通过选项给全，缺省项取默认值）
   --help                 显示本帮助
@@ -90,7 +97,8 @@ const HELP = `品牌参数化脚本
   bun scripts/init-template.mjs
   bun scripts/init-template.mjs --dry-run
   bun scripts/init-template.mjs --yes --title "某某协会" --slug my-association \\
-    --uni-appid __UNI__ABC --wx-appid wxabc --admin-email admin@example.com
+    --uni-appid __UNI__ABC --wx-appid wxabc --admin-email admin@example.com \\
+    --backend-port 3000 --frontend-port 9000
 `
 
 // ───────────────────────────── 交互收集 ─────────────────────────────
@@ -102,6 +110,8 @@ async function promptValues(cli) {
       uniAppid: cli.uniAppid ?? DEFAULTS.uniAppid,
       wxAppid: cli.wxAppid ?? DEFAULTS.wxAppid,
       adminEmail: cli.adminEmail ?? DEFAULTS.adminEmail,
+      backendPort: Number(cli.backendPort ?? DEFAULTS.backendPort),
+      frontendPort: Number(cli.frontendPort ?? DEFAULTS.frontendPort),
     }
   }
   const rl = createInterface({ input: process.stdin, output: process.stdout })
@@ -117,6 +127,8 @@ async function promptValues(cli) {
       uniAppid: await ask('uni-app AppID', 'uniAppid'),
       wxAppid: await ask('微信小程序 AppID（不做小程序可先保留占位）', 'wxAppid'),
       adminEmail: await ask('初始管理员邮箱（登录页预填值 + backend/.env）', 'adminEmail'),
+      backendPort: Number(await ask('后端开发端口（Nuxt / API）', 'backendPort')),
+      frontendPort: Number(await ask('前端 H5 开发端口（vite devServer）', 'frontendPort')),
     }
     return values
   }
@@ -136,6 +148,16 @@ function validate(v) {
     errors.push(`管理员邮箱格式不正确：${v.adminEmail}`)
   if (!v.uniAppid.trim() || !v.wxAppid.trim())
     errors.push('AppID 不能为空（暂无正式 AppID 可保留占位值）')
+  const portLabel = { backendPort: '后端端口', frontendPort: '前端端口' }
+  for (const key of ['backendPort', 'frontendPort']) {
+    if (!Number.isInteger(v[key]) || v[key] < 1 || v[key] > 65535)
+      errors.push(`${portLabel[key]}必须是 1-65535 的整数：${v[key]}`)
+  }
+  if (
+    Number.isInteger(v.backendPort) && Number.isInteger(v.frontendPort)
+    && v.backendPort === v.frontendPort
+  )
+    errors.push(`前后端端口不能相同：${v.backendPort}`)
   return errors
 }
 
@@ -167,6 +189,24 @@ function abs(rel) {
   return resolve(ROOT, rel)
 }
 
+/** 按键名写入 env，发生变化时向 details 追加预览明细 */
+function applySetEnv(content, key, value, details) {
+  const next = setEnvVar(content, key, String(value))
+  if (next !== content)
+    details.push(`${key} = ${value}`)
+  return next
+}
+
+/** 字面量替换，命中时向 details 追加预览明细 */
+function applyLiteral(content, from, to, details) {
+  if (from === to)
+    return content
+  const [next, count] = replaceLiteral(content, from, to)
+  if (count > 0)
+    details.push(`${from} → ${to}（${count} 处）`)
+  return next
+}
+
 // ───────────────────────────── 主流程 ─────────────────────────────
 async function main() {
   const cli = parseArgs(process.argv.slice(2))
@@ -189,29 +229,51 @@ async function main() {
   }
 
   // 字面量替换对（顺序敏感：邮箱、复合串必须排在短串之前）
+  const defaultBackendOrigin = `http://localhost:${DEFAULTS.backendPort}`
+  const defaultFrontendOrigin = `http://localhost:${DEFAULTS.frontendPort}`
   const pairs = [
     [DEFAULTS.adminEmail, values.adminEmail],
     [`${DEFAULTS.slug}-backend`, `${values.slug}-backend`],
     [DEFAULTS.title, values.title],
     [DEFAULTS.uniAppid, values.uniAppid],
     [DEFAULTS.wxAppid, values.wxAppid],
+    [defaultBackendOrigin, `http://localhost:${values.backendPort}`],
+    [defaultFrontendOrigin, `http://localhost:${values.frontendPort}`],
     [DEFAULTS.slug, values.slug],
   ]
 
   const plan = [] // {file, changes: string[], missing?}
 
-  // 1) env 文件：按键名赋值
+  // 1) env 文件：按键名赋值（端口相关值同步联动）
+  const newBackendOrigin = `http://localhost:${values.backendPort}`
+  const newFrontendOrigin = `http://localhost:${values.frontendPort}`
+
+  // frontend/env/.env：应用标题 / AppID / 前端端口 / 代理目标
   const frontendEnv = 'frontend/env/.env'
   if (existsSync(abs(frontendEnv))) {
     let c = readFileSync(abs(frontendEnv), 'utf8')
-    const before = c
-    c = setEnvVar(c, 'VITE_APP_TITLE', values.title)
-    c = setEnvVar(c, 'VITE_UNI_APPID', values.uniAppid)
-    c = setEnvVar(c, 'VITE_WX_APPID', values.wxAppid)
-    plan.push({ file: frontendEnv, content: c, changed: c !== before })
+    const details = []
+    c = applySetEnv(c, 'VITE_APP_TITLE', values.title, details)
+    c = applySetEnv(c, 'VITE_APP_PORT', values.frontendPort, details)
+    c = applySetEnv(c, 'VITE_UNI_APPID', values.uniAppid, details)
+    c = applySetEnv(c, 'VITE_WX_APPID', values.wxAppid, details)
+    c = applyLiteral(c, defaultBackendOrigin, newBackendOrigin, details)
+    plan.push({ file: frontendEnv, content: c, changes: details, changed: details.length > 0 })
   }
   else {
     plan.push({ file: frontendEnv, missing: true })
+  }
+
+  // frontend/env/.env.development：本地联调代理目标（值行 + 说明注释中的 URL 一并替换）
+  const frontendDevEnv = 'frontend/env/.env.development'
+  if (existsSync(abs(frontendDevEnv))) {
+    let c = readFileSync(abs(frontendDevEnv), 'utf8')
+    const details = []
+    c = applyLiteral(c, defaultBackendOrigin, newBackendOrigin, details)
+    plan.push({ file: frontendDevEnv, content: c, changes: details, changed: details.length > 0 })
+  }
+  else {
+    plan.push({ file: frontendDevEnv, missing: true })
   }
 
   for (const envFile of ['backend/.env.example', 'backend/.env']) {
@@ -222,10 +284,16 @@ async function main() {
       continue
     }
     let c = readFileSync(abs(envFile), 'utf8')
-    const before = c
+    const details = []
+    const beforeDb = c
     c = setDbName(c, values.slug)
-    c = setEnvVar(c, 'ADMIN_EMAIL', values.adminEmail)
-    plan.push({ file: envFile, content: c, changed: c !== before })
+    if (c !== beforeDb)
+      details.push(`DATABASE_URL 数据库名 → ${values.slug}`)
+    c = applySetEnv(c, 'PORT', values.backendPort, details)
+    c = applySetEnv(c, 'BETTER_AUTH_URL', newBackendOrigin, details)
+    c = applySetEnv(c, 'TRUSTED_ORIGINS', `${newBackendOrigin},${newFrontendOrigin}`, details)
+    c = applySetEnv(c, 'ADMIN_EMAIL', values.adminEmail, details)
+    plan.push({ file: envFile, content: c, changes: details, changed: details.length > 0 })
   }
 
   // 2) 源码/配置文件：字面量替换
@@ -299,7 +367,9 @@ async function main() {
    - backend/.env：BETTER_AUTH_SECRET、ADMIN_PASSWORD、WECHAT_*、TENCENT_COS_*（勿入库）
    - frontend/env/.env.production / .env.test：生产/测试域名与 VITE_SERVER_BASEURL__WEIXIN_*
    - 若 slug 已改，本地需新建数据库：CREATE DATABASE ${values.slug}; 再执行 bun run db:migrate / db:seed
-4. TRUSTED_ORIGINS（backend/.env）：如前端/后端端口有变化需同步
+4. TRUSTED_ORIGINS（backend/.env）：本地前后端端口已由脚本（--backend-port/--frontend-port）
+   连同 PORT、BETTER_AUTH_URL、VITE_APP_PORT、VITE_SERVER_BASEURL 一并同步；
+   生产/测试域名来源仍需自行追加
 5. 工程元信息：两个 package.json 的 name/description/repository、LICENSE、git remote
 6. AGENTS.md 中与品牌无关的路径/约定按需调整
 `)

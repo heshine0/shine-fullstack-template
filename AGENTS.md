@@ -12,8 +12,10 @@
 
 跨工程共识（两份文档中均有完整记载）：
 
-- 包管理器统一 **Bun 1.4.0**；后端端口 **3000**，前端 H5 端口 **9000**。
+- 包管理器统一 **Bun 1.4.0**；本地开发后端默认端口 **3000**、前端 H5 默认 **9000**
+  （可用 `scripts/init-template.mjs` 的 `--backend-port` / `--frontend-port` 修改并自动同步各配置点）。
 - 认证为 **Better Auth Cookie 单通道**：HttpOnly Cookie 会话，全链路无 token/Authorization。
 - H5 经 vite 代理同源访问：`http://localhost:9000/api/**` → `http://localhost:3000/api/**`（保留前缀不 rewrite）。
 - Git 仓库在根目录，两个子工程均无独立 `.git`；不要自动创建 commit。
-- 派生新项目使用根目录脚本 `scripts/init-template.mjs`（用法与白名单详见两份子文档）。
+- 派生新项目使用根目录脚本 `scripts/init-template.mjs`（用法与白名单详见两份子文档；
+  支持 `--backend-port` / `--frontend-port` 一并修改本地联调端口）。

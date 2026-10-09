@@ -12,7 +12,7 @@ import { toLoginPage } from '@/utils/toLoginPage'
 // 菜单图标经数据动态绑定，需在此注释占位，确保 UnoCSS 扫描生成对应样式：
 // i-carbon-calendar i-carbon-star i-carbon-notification
 // i-carbon-security i-carbon-locked i-carbon-chat i-carbon-information
-// i-carbon-contrast i-carbon-color-palette
+// i-carbon-contrast i-carbon-color-palette i-carbon-dashboard
 
 definePage({
   style: {
@@ -86,6 +86,10 @@ const menuGroups = computed<MeMenuItem[][]>(() => [
   [
     { key: 'theme-mode', label: `外观模式（${modeLabel.value}）`, icon: 'i-carbon-contrast', action: pickThemeMode },
     { key: 'theme-brand', label: `主题色（${brandLabel.value}）`, icon: 'i-carbon-color-palette', action: pickThemeBrand },
+  ],
+  [
+    // web-view 免登录打开后端管理后台（票据 60s 一次性，页面内即时生成）
+    { key: 'admin-web', label: '管理后台', icon: 'i-carbon-dashboard', url: '/pages/webview/admin/index' },
   ],
 ])
 

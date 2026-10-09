@@ -1,6 +1,6 @@
 import { betterAuth } from 'better-auth'
 import { drizzleAdapter } from 'better-auth/adapters/drizzle'
-import { phoneNumber } from 'better-auth/plugins'
+import { oneTimeToken, phoneNumber } from 'better-auth/plugins'
 import { db } from '../database/client'
 import * as schema from '../database/schema'
 import { ensureUserRoleByName, getRoleNamesByUserId } from '../database/repositories/roles'
@@ -66,7 +66,18 @@ export const auth = betterAuth({
       }
     }),
     // 微信小程序「获取手机号」一键登录（/api/auth/wechat/phone-sign-in）
-    wechatPhone()
+    wechatPhone(),
+    // 小程序 web-view 免登录访问管理后台的一次性票据：
+    // GET  /api/auth/one-time-token/generate（需已登录会话）→ { token }
+    // POST /api/auth/one-time-token/verify（公开）→ 原子消费票据并 Set-Cookie
+    // - 有效期 60s（expiresIn 单位为分钟，最小 1），票据仅一次性使用（consume 即删除）
+    // - storeToken:'hashed'：verification 表只存 token 的 SHA-256，明文仅返回一次
+    // - 注意：兑换后 web-view 与小程序【共享同一条 session】（插件存的是当前 session token），
+    //   任一端 sign-out 会同时让另一端失效；无新建独立会话
+    oneTimeToken({
+      expiresIn: 1,
+      storeToken: 'hashed'
+    })
   ],
   databaseHooks: {
     user: {

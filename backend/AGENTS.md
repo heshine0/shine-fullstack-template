@@ -116,6 +116,14 @@ bun run dev           # http://localhost:3000
   （授权判据 `role.name === 'admin'`，角色挂在 user_role 关联表）。
 - 限流：进程内固定窗口 60s；全局默认 300/min，敏感端点（登录/注册/发 OTP/管理员建用户）10/min。
   手工测试触发 429 后需等约 65 秒。
+- 小程序 web-view 免登录：Better Auth 官方 **one-time-token 插件**（`server/utils/auth.ts`，
+  `expiresIn:1` 即 60s、`storeToken:'hashed'`，记录落 verification 表、无独立建表）。
+  `GET /api/auth/one-time-token/generate`（插件 sessionMiddleware 强制登录）返回一次性票据；
+  小程序拼 `管理后台基址/sso-login#ott=<token>&redirect=/dashboard` 打开 web-view；落地页
+  `app/pages/sso-login.vue`（auth.global.ts 匿名白名单）POST `/one-time-token/verify` 兑换，
+  成功后 Set-Cookie 写同一条会话并跳站内白名单路径。注意：**web-view 与小程序共享同一条
+  session**（插件 verify 不新建会话），任一端 sign-out 会同时让另一端失效；verify 按敏感端点
+  限流，二次兑换/过期票据返回 400（better-call 原生错误格式，非项目统一信封）。
 - `phoneNumber` 在 Better Auth 1.7 中是**插件**（`better-auth/plugins`），不是顶层配置字段。
 
 ### 6.3 数据层

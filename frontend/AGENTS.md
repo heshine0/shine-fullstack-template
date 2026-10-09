@@ -82,6 +82,13 @@ bun run dev:h5       # http://localhost:9000
    下用 `definePage({...})` 声明。
 3. 平台差异只用条件编译（`// #ifdef H5`）；样式优先 UnoCSS 原子类。
 4. 环境变量放在 `frontend/env/`（vite 的 `envDir` 已指向这里），且必须以 `VITE_` 开头。
+5. **web-view 免登录管理后台**：入口在「我的」页 → `/pages/webview/admin/index`；页面 onLoad
+   调 `generateOneTimeToken()`（`src/api/auth.ts`，GET `/auth/one-time-token/generate`，
+   rawAuth）取 60s 一次性票据，拼 `${VITE_ADMIN_WEB_URL}/sso-login#ott=...&redirect=/dashboard`
+   给 `<web-view>`，后台落地页兑换成 Cookie 会话。`VITE_ADMIN_WEB_URL` 缺省回退
+   `getEnvBaseUrl()`（含微信 develop/trial/release 覆写）。生产须 HTTPS 且在小程序后台配置
+   「业务域名」；开发者工具联调勾选「不校验合法域名」，真机用电脑局域网 IP。
+   web-view 与小程序**共享同一条 Better Auth session**（任一端退出会同时失效）。
 
 ## 6. Windows / PowerShell 注意事项
 

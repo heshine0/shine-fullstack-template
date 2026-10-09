@@ -1,7 +1,8 @@
 <script setup lang="ts">
+import { useInjectedPageTitle } from '@/hooks/usePageTitle'
 import { useAuthStore } from '@/store/auth'
 import { isPageTabbar } from '@/tabbar/store'
-import { HOME_PAGE } from '@/utils'
+import { getAllPages, HOME_PAGE } from '@/utils'
 import { toLoginPage } from '@/utils/toLoginPage'
 import { systemInfo } from '@/utils/systemInfo'
 
@@ -18,20 +19,26 @@ const headerTotalHeight = statusBarHeight + NAV_BAR_HEIGHT
 const auth = useAuthStore()
 
 /**
- * 页面路径 → 标题。
- * 需与各页 definePage 的 style.navigationBarTitleText 保持同步。
+ * 页面路径 → 标题兜底映射，只读引用生成物 src/pages.json 中各页的
+ * style.navigationBarTitleText（主包 + 分包），模块加载时构建一次。
+ * 各页只需在 definePage 维护一处标题，无需再与本布局手工同步。
  */
-const PAGE_TITLES: Record<string, string> = {
-  '/pages/index/index': '首页',
-  '/pages/about/about': '关于',
-  '/pages/login/index': '登录',
-  '/pages/me/me': '我的',
-  '/pages/me/profile': '个人信息',
-}
+const PAGE_TITLES: Record<string, string> = Object.fromEntries(
+  getAllPages()
+    .map(page => [page.path, page.style?.navigationBarTitleText ?? ''] as const)
+    .filter(([, pageTitle]) => pageTitle),
+)
 
-// 当前页标题与是否为 tab 页：布局组件随页面创建而挂载，onMounted 中读取页面栈即可
-const title = ref('')
+// 当前页是否为 tab 页：布局组件随页面创建而挂载，onMounted 中读取页面栈即可
 const isTab = ref(false)
+// 路径映射兜底标题；页面实例固定对应一个路由，挂载时取一次即可
+const fallbackTitle = ref('')
+
+// 标题优先级：页面通过 usePageTitle provide 的专属标题 > PAGE_TITLES 路径映射兜底。
+// inject 沿父链解析，只会拿到「所属页面」provide 的状态；页面实例随页面栈保留，
+// 故返回上一页 / switchTab 切回时标题随实例天然恢复，不存在跨页面残留。
+const injectedPageTitle = useInjectedPageTitle()
+const title = computed(() => injectedPageTitle?.title.value ?? fallbackTitle.value)
 
 function syncCurrentPage() {
   const pages = getCurrentPages()
@@ -39,7 +46,7 @@ function syncCurrentPage() {
   if (!last)
     return
   const path = `/${last.route}`
-  title.value = PAGE_TITLES[path] || ''
+  fallbackTitle.value = PAGE_TITLES[path] || ''
   isTab.value = isPageTabbar(path)
 }
 

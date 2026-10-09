@@ -69,16 +69,19 @@ bun run dev           # http://localhost:3000
 
 初始管理员账号不写入文档；它由 `ADMIN_EMAIL` / `ADMIN_PASSWORD` 经 `bun run db:seed` 创建。
 
-前端需另开终端启动（`cd ../frontend; bun run dev:h5`，H5 固定 9000 端口），详见
-[../frontend/AGENTS.md](../frontend/AGENTS.md)。
+前端需另开终端启动（`cd ../frontend; bun run dev:h5`，H5 默认 9000 端口），详见
+[../frontend/AGENTS.md](../frontend/AGENTS.md)。本地联调端口可用根目录 `scripts/init-template.mjs`
+的 `--backend-port` / `--frontend-port` 修改（自动同步本工程 PORT、BETTER_AUTH_URL、TRUSTED_ORIGINS）。
 
 ## 5. 本地联调架构（重要）
 
-- 后端固定 **3000**，前端 H5 固定 **9000**。
+- 后端默认端口 **3000**（`backend/.env` 的 `PORT`，`nuxt.config.ts` 读取），
+  前端 H5 默认 **9000**（`frontend/env/.env` 的 `VITE_APP_PORT`）；两者可用
+  `scripts/init-template.mjs --backend-port/--frontend-port` 一次性同步修改。
 - 前端 `frontend/vite.config.ts` 的 devServer 代理：键 `VITE_APP_PROXY_PREFIX`（默认 `/api`）
   → 目标 `VITE_SERVER_BASEURL`（`http://localhost:3000`），`changeOrigin: true`，
   **不做路径 rewrite**（后端路由本身含 `/api` 前缀，含 Better Auth 的 `/api/auth/*`）。
-  主链路为 9000 代理同源访问，不触发跨域。
+  主链路为前端 H5 经代理同源访问，不触发跨域。
 - 非 H5 端（小程序/App）没有 vite 代理：前端 `src/http/alova.ts` 用条件编译把 baseURL
   切为 `${VITE_SERVER_BASEURL}/api` 直连（跨域 Cookie 需后端 CORS + 凭证支持）。
 - 后端 `server/middleware/05.cors.ts` 仅对 `TRUSTED_ORIGINS` 中的来源回显具体 Origin，
@@ -176,9 +179,10 @@ bun ../scripts/init-template.mjs --yes `
 
 （脚本位于仓库根 `scripts/init-template.mjs`，在仓库根或任一子目录下执行均可，以下路径以仓库根为基准。）
 
-- 参数：品牌中文名、英文 slug（数据库名/health 服务名）、uni-app 与微信 AppID、管理员邮箱。
+- 参数：品牌中文名、英文 slug（数据库名/health 服务名）、uni-app 与微信 AppID、管理员邮箱、
+  后端/前端开发端口（`--backend-port` / `--frontend-port`，默认 3000 / 9000）。
 - 替换范围是脚本内**白名单文件**（前端 env/pages.config/页面与布局、后端 env 示例/后台页面/
-  drizzle.config/health、根 AGENTS.md）；env 按键名幂等赋值、源码做一次性字面量替换。
+  drizzle.config/health、根及两个子工程的 AGENTS.md）；env 按键名幂等赋值、源码做一次性字面量替换。
   `.trae/` 历史文档、lockfile、二进制资产不处理。
 - 脚本结束会打印仍需手动处理的清单：应用图标、Android 权限、生产域名、`backend/.env`
   密钥（BETTER_AUTH_SECRET/WECHAT/COS）、slug 变更后的建库与迁移、package.json 元信息、

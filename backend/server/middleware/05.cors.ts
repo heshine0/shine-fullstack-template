@@ -1,6 +1,6 @@
 /**
- * 凭证感知的 CORS（dev proxy 的兜底：前端直连 3000 时也能携带 Cookie）。
- * 主链路是前端 9000 经 vite proxy 同源访问，故通常不会触发跨域。
+ * 凭证感知的 CORS（dev proxy 的兜底：非 H5 端或关闭代理时直连后端端口也能携带 Cookie）。
+ * 主链路是前端 H5 经 vite proxy 同源访问，故通常不会触发跨域。
  * 仅对 TRUSTED_ORIGINS 中的来源回显具体 Origin（不能与 credentials 同时用 *）。
  */
 export default defineEventHandler((event) => {

@@ -10,7 +10,7 @@ const envSchema = z.object({
   DATABASE_URL: z.string().url('DATABASE_URL 必须是合法的连接串'),
   BETTER_AUTH_URL: z.string().url('BETTER_AUTH_URL 必须是合法的 URL'),
   BETTER_AUTH_SECRET: z.string().min(32, 'BETTER_AUTH_SECRET 至少 32 个字符'),
-  TRUSTED_ORIGINS: z.string().default('http://localhost:3000'),
+  TRUSTED_ORIGINS: z.string().default('http://localhost:3000,http://localhost:9000'),
   ADMIN_EMAIL: z.string().email().optional(),
   ADMIN_PASSWORD: z.string().min(8).optional(),
   RATE_LIMIT_GLOBAL_MAX: z.coerce.number().int().positive().default(300),

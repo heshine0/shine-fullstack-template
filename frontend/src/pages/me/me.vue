@@ -13,6 +13,7 @@ import { toLoginPage } from '@/utils/toLoginPage'
 // i-carbon-calendar i-carbon-star i-carbon-notification
 // i-carbon-security i-carbon-locked i-carbon-chat i-carbon-information
 // i-carbon-contrast i-carbon-color-palette i-carbon-dashboard
+// i-carbon-text-bold
 
 definePage({
   style: {
@@ -90,6 +91,7 @@ const menuGroups = computed<MeMenuItem[][]>(() => [
   [
     // web-view 免登录打开后端管理后台（票据 60s 一次性，页面内即时生成）
     { key: 'admin-web', label: '管理后台', icon: 'i-carbon-dashboard', url: '/pages/webview/admin/index' },
+    { key: 'richtext', label: '富文本演示', icon: 'i-carbon-text-bold', url: '/pages/richtext/demo' },
   ],
 ])
 

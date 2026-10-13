@@ -9,6 +9,9 @@ export default uniHelper({
     '**/uni_modules/',
     // 忽略原生插件目录
     '**/nativeplugins/',
+    // mp-html 定制构建的第三方 vendored 产物（由 scripts/vendor-mp-html.mjs 生成）
+    'src/components/mp-html/**',
+    'src/static/app-plus/**',
     'dist',
     // unplugin-auto-import 生成的类型文件，每次提交都改变，所以加入这里吧，与 .gitignore 配合使用
     'auto-import.d.ts',

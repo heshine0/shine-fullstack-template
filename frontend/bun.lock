@@ -76,6 +76,7 @@
         "lint-staged": "^15.2.10",
         "miniprogram-api-typings": "^4.1.0",
         "miniprogram-ci": "^2.1.26",
+        "mp-html": "2.5.2",
         "openapi-ts-request": "^1.10.0",
         "picocolors": "^1.1.1",
         "postcss": "^8.4.49",
@@ -2845,6 +2846,8 @@
     "moment": ["moment@2.31.0", "https://registry.npmmirror.com/moment/-/moment-2.31.0.tgz", {}, "sha512-0acOTfMiWOheYS4eoWb80yYMb/JLvVv9SHbs2PehaDzfUG0Bw855SKyk0IKTnPGa5+U2bmi3W68l1+sGLX/pvw=="],
 
     "moment-timezone": ["moment-timezone@0.5.48", "https://registry.npmmirror.com/moment-timezone/-/moment-timezone-0.5.48.tgz", { "dependencies": { "moment": "^2.29.4" } }, "sha512-f22b8LV1gbTO2ms2j2z13MuPogNoh5UzxL3nzNAYKGraILnbGc9NEE6dyiiiLv46DGRb8A4kg8UKWLjPthxBHw=="],
+
+    "mp-html": ["mp-html@2.5.2", "https://registry.npmmirror.com/mp-html/-/mp-html-2.5.2.tgz", {}, "sha512-45e8c32Qgux4YU4iC3qCSFsOh3y+RwPwZ+iz/vvLkDgSGWk+1zsL4WUzWWQc9w3AsAfkaD/QR0oIufIDngBmXA=="],
 
     "mri": ["mri@1.2.0", "https://registry.npmmirror.com/mri/-/mri-1.2.0.tgz", {}, "sha512-tzzskb3bG8LvYGFF/mDTpq3jpI6Q9wc3LEmBaghu+DdCssd1FakN7Bc0hVNmEyGq1bq3RgfkCb3cmQLpNPOroA=="],
 

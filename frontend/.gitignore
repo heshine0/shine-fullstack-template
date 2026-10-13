@@ -12,6 +12,9 @@ node_modules
 dist
 *.local
 
+# mp-html 定制构建工作目录（产物输出到 src/components/mp-html 并纳入版本管理）
+.mp-html-build
+
 # Editor directories and files
 .idea
 *.suo

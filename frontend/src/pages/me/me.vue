@@ -90,6 +90,8 @@ const menuGroups = computed<MeMenuItem[][]>(() => [
   [
     // web-view 免登录打开后端管理后台（票据 60s 一次性，页面内即时生成）
     { key: 'admin-web', label: '管理后台', icon: 'i-carbon-dashboard', url: '/pages/webview/admin/index' },
+    // WebView 富文本编辑器演示（后端 UEditor + 草稿表中转）
+    { key: 'richtext', label: '富文本演示', icon: 'i-carbon-text-bold', url: '/pages/richtext/demo' },
   ],
 ])
 

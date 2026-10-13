@@ -18,7 +18,6 @@
   "packageManager": "bun@1.4.0",
   "description": "unibest - 最好的 uniapp 开发模板",
   "generate-time": "用户创建项目时生成",
-
   "license": "MIT",
   "homepage": "https://unibest.tech",
   "repository": "https://github.com/feige996/unibest",
@@ -97,6 +96,7 @@
     "build:quickapp-webview-union": "uni build -p quickapp-webview-union",
     "upload:changeset": "bun x changeset && bun x changeset version",
     "upload:mp": "bun ./scripts/upload-weixin.js",
+    "vendor:mp-html": "node scripts/vendor-mp-html.mjs",
     "type-check": "vue-tsc --noEmit",
     "lint": "eslint",
     "lint:fix": "eslint --fix",
@@ -175,6 +175,7 @@
     "lint-staged": "^15.2.10",
     "miniprogram-api-typings": "^4.1.0",
     "miniprogram-ci": "^2.1.26",
+    "mp-html": "2.5.2",
     "openapi-ts-request": "^1.10.0",
     "picocolors": "^1.1.1",
     "postcss": "^8.4.49",

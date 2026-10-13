@@ -62,5 +62,22 @@ export const setting = pgTable('setting', {
   value: jsonb('value').$type<unknown>().notNull()
 })
 
+/**
+ * 富文本编辑器草稿表。
+ * TTL 7 天惰性清理（GET/PUT 命中过期草稿返回 404）。
+ * content 上限 100 万字符（Zod 校验）。
+ */
+export const editorDraft = pgTable('editor_draft', {
+  id: text('id')
+    .primaryKey()
+    .$defaultFn(() => crypto.randomUUID()),
+  userId: text('user_id')
+    .notNull()
+    .references(() => user.id, { onDelete: 'cascade' }),
+  content: text('content').notNull().default(''),
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow()
+})
+
 // Better Auth 四张表
 export { account, session, user, verification } from './auth-schema'

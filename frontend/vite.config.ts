@@ -83,7 +83,11 @@ export default defineConfig(({ command, mode }) => {
       UniComponents({
         extensions: ['vue'],
         deep: true, // 是否递归扫描子目录，
-        directoryAsNamespace: false, // 是否把目录名作为命名空间前缀，true 时组件名为 目录名+组件名，
+        directoryAsNamespace: false, // 是否把目录名+组件名作为命名空间前缀，true 时组件名为 目录名+组件名，
+        // mp-html 为 gulp 定制构建的 vendored 第三方产物（tsconfig 已 exclude，vue-tsc 不解析），
+        // 不为其生成 components.d.ts 声明，否则声明文件会把 exclude 目录重新拉入编译导致 TS6307。
+        // <mp-html> 标签由 uni-app 原生 easycom（components/<name>/<name>.vue 约定）自动解析。
+        excludeNames: /^(MpHtml|Audio|Node)$/,
         dts: 'src/types/components.d.ts', // 自动生成的组件类型声明文件路径（用于 TypeScript 支持）
       }),
       UniPages({

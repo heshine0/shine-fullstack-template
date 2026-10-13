@@ -5,6 +5,6 @@ export default defineConfig({
     environment: 'node',
     globals: true,
     setupFiles: ['./vitest.setup.ts'],
-    include: ['server/**/*.test.ts']
+    include: ['server/**/*.test.ts', 'app/**/*.test.ts']
   }
 })

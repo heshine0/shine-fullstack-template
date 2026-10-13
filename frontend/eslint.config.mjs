@@ -21,6 +21,8 @@ export default uniHelper({
     'src/service/**',
     // AI 辅助技能与示例文档目录（第三方参考资料），不属于交付代码
     '.agents/**',
+    // mp-html 第三方组件产物（vendor 构建），不参与 lint
+    'src/components/mp-html/**',
   ],
   // https://eslint-config.antfu.me/rules
   rules: {

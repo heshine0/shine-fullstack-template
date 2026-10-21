@@ -110,17 +110,27 @@ export function extFromMime(mime: string | undefined | null): string | null {
   return MIME_TO_EXT[m] ?? null
 }
 
+/** 中间目录段合法字符：字母、数字、-、_，长度 1-64（单段，不含 `/`）。 */
+export const FOLDER_RE = /^[A-Za-z0-9_-]{1,64}$/
+
 /**
- * 生成 COS 对象键：`<prefix><uuid>.<ext>`。
+ * 生成 COS 对象键：`<prefix>[<folder>/]<uuid>.<ext>`。
+ * folder 为可选中间目录段，仅当匹配 FOLDER_RE 时才插入（非法值忽略，防注入）。
  * 服务端生成随机 UUID，客户端无法预测或覆盖他人对象。
  */
-export function buildObjectKey(type: MediaType, ext?: string | null): string {
+export function buildObjectKey(type: MediaType, ext?: string | null, folder?: string | null): string {
   const { prefix } = MEDIA_TYPE_CONFIG[type]
+  const safeFolder = folder && FOLDER_RE.test(folder) ? `${folder}/` : ''
   const safeExt = ext && /^[a-z0-9]{1,8}$/.test(ext) ? `.${ext}` : ''
-  return `${prefix}${crypto.randomUUID()}${safeExt}`
+  return `${prefix}${safeFolder}${crypto.randomUUID()}${safeExt}`
 }
 
 const UUID_RE = /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/
+
+/** 对象键主体（前缀之后）：可选 folder 段 + uuid + 可选扩展名。 */
+const OBJECT_KEY_RE = new RegExp(
+  `^(?:[A-Za-z0-9_-]{1,64}\\/)?(${UUID_RE.source})(?:\\.([a-z0-9]{1,8}))?$`
+)
 
 export interface ParsedObjectKey {
   type: MediaType
@@ -129,15 +139,16 @@ export interface ParsedObjectKey {
 }
 
 /**
- * 严格解析对象键：`<prefix><uuid>[.<ext>]`。
- * 前缀必须与某类型注册前缀完全一致；不匹配（含 `../`、伪造前缀、非 uuid）返回 null。
+ * 严格解析对象键：`<prefix>[<folder>/]<uuid>[.<ext>]`。
+ * 前缀必须与某类型注册前缀完全一致；folder 段仅允许 FOLDER_RE 字符；
+ * 不匹配（含 `../`、嵌套目录、伪造前缀、非 uuid）返回 null。
  */
 export function parseObjectKey(key: string): ParsedObjectKey | null {
   for (const type of MEDIA_TYPES) {
     const { prefix } = MEDIA_TYPE_CONFIG[type]
     if (!key.startsWith(prefix)) continue
     const rest = key.slice(prefix.length)
-    const match = new RegExp(`^(${UUID_RE.source})(?:\\.([a-z0-9]{1,8}))?$`).exec(rest)
+    const match = OBJECT_KEY_RE.exec(rest)
     if (!match) return null
     return { type, id: match[1]!, ext: match[2] ?? null }
   }

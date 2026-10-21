@@ -20,6 +20,8 @@ const props = withDefaults(defineProps<{
   multiple?: boolean
   maxCount?: number
   disabled?: boolean
+  /** 可选中间目录段（字母/数字/-/_，1-64 字符），上传 key 变为 <类型前缀><folder>/<uuid> */
+  folder?: string
   /** 裸模式：不渲染组件自带触发区与结果 UI，仅通过 expose 的 trigger() 与 change 事件工作。 */
   bare?: boolean
 }>(), {
@@ -236,7 +238,7 @@ async function process(tempId: string) {
 
   try {
     const row = await uploadMedia(
-      { ...source, type: props.type },
+      { ...source, type: props.type, folder: props.folder },
       {
         onProgress: (progress) => {
           const target = items.value.find(i => i.id === tempId)

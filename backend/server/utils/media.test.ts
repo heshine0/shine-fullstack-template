@@ -65,6 +65,17 @@ describe('buildObjectKey', () => {
     expect(key).toMatch(/^files\/[0-9a-f-]{36}$/)
   })
 
+  it('inserts a validated intermediate folder before the uuid', () => {
+    const key = buildObjectKey('image', 'jpg', 'avatar')
+    expect(key).toMatch(/^images\/avatar\/[0-9a-f-]{36}\.jpg$/)
+    expect(parseObjectKey(key)).not.toBeNull()
+  })
+
+  it('ignores an invalid folder segment', () => {
+    const key = buildObjectKey('image', 'jpg', '../evil')
+    expect(key).toMatch(/^images\/[0-9a-f-]{36}\.jpg$/)
+  })
+
   it('builds keys that parse back to the same type', () => {
     for (const type of ['image', 'video', 'audio', 'file'] as const) {
       const key = buildObjectKey(type, extFromMime(
@@ -85,6 +96,8 @@ describe('parseObjectKey', () => {
   it('parses legitimate keys', () => {
     expect(parseObjectKey(`images/${UUID}.jpg`)).toEqual({ type: 'image', id: UUID, ext: 'jpg' })
     expect(parseObjectKey(`files/${UUID}`)).toEqual({ type: 'file', id: UUID, ext: null })
+    expect(parseObjectKey(`images/avatar/${UUID}.jpg`)).toEqual({ type: 'image', id: UUID, ext: 'jpg' })
+    expect(parseObjectKey(`videos/my-folder_1/${UUID}.mp4`)?.type).toBe('video')
   })
 
   it('rejects path traversal and forged keys', () => {
@@ -95,6 +108,9 @@ describe('parseObjectKey', () => {
     expect(parseObjectKey(`evil/${UUID}.jpg`)).toBeNull()
     expect(parseObjectKey(`images/${UUID}.EXE`)).toBeNull()
     expect(parseObjectKey('')).toBeNull()
+    expect(parseObjectKey(`images/a b/${UUID}.jpg`)).toBeNull()
+    expect(parseObjectKey(`images/../../${UUID}.jpg`)).toBeNull()
+    expect(parseObjectKey(`images/a/b/${UUID}.jpg`)).toBeNull()
   })
 
   it('derives type strictly from the registered prefix', () => {

@@ -12,6 +12,9 @@ node_modules
 dist
 *.local
 
+# mp-html vendor 构建工作目录（gulp 工具链临时副本，产物在 src/components/mp-html）
+.mp-html-build
+
 # Editor directories and files
 .idea
 *.suo

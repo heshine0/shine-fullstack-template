@@ -49,6 +49,8 @@ export interface CredentialRequestBody {
   contentType: string
   size?: number
   filename?: string
+  /** 可选中间目录段（字母/数字/-/_，1-64 字符），key 变为 <prefix><folder>/<uuid> */
+  folder?: string
 }
 
 /** 申请 COS 直传临时凭证（key 级最小授权）。 */

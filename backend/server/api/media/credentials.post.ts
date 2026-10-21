@@ -16,7 +16,7 @@ import {
 export default defineEventHandler(async (event) => {
   requireUser(event)
   const body = await parseBody(event, credentialBodySchema)
-  const { type, contentType, size } = body
+  const { type, contentType, size, folder } = body
 
   if (!mimeMatchesType(type, contentType)) {
     throw createApiError('VALIDATION_ERROR', {
@@ -27,7 +27,7 @@ export default defineEventHandler(async (event) => {
     throw createApiError('VALIDATION_ERROR', { message: '文件大小超过限制' })
   }
 
-  const key = buildObjectKey(type, extFromMime(contentType))
+  const key = buildObjectKey(type, extFromMime(contentType), folder)
 
   let credential
   try {

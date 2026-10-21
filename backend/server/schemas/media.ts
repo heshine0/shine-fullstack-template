@@ -9,7 +9,11 @@ export const credentialBodySchema = z
     type: mediaTypeSchema,
     contentType: z.string().trim().min(1).max(100),
     size: z.number().int().positive().max(500 * 1024 * 1024).optional(),
-    filename: z.string().trim().min(1).max(200).optional()
+    filename: z.string().trim().min(1).max(200).optional(),
+    folder: z
+      .string()
+      .regex(/^[A-Za-z0-9_-]{1,64}$/, { message: '目录名只能包含字母、数字、-、_' })
+      .optional()
   })
   .strict()
 

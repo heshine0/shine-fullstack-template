@@ -11,6 +11,8 @@ export interface UploadMediaSource {
   path?: string
   /** 文件名（用于申请凭证与登记 metadata.name） */
   name: string
+  /** 可选中间目录段（字母/数字/-/_），透传给后端生成 key */
+  folder?: string
   /** 文件大小（字节） */
   size: number
   /** MIME 类型 */
@@ -38,13 +40,14 @@ export async function uploadMedia(
   source: UploadMediaSource,
   options: UploadMediaOptions = {},
 ): Promise<MediaFileRow> {
-  const { type, name, size, contentType, width, height, duration } = source
+  const { type, name, size, contentType, width, height, duration, folder } = source
 
   const cred = await getMediaCredential({
     type,
     contentType,
     size,
     filename: name,
+    ...(folder ? { folder } : {}),
   })
 
   const fields = buildPostFormFields(cred.credential, cred.bucket, cred.key, contentType)

@@ -1,4 +1,4 @@
-import { count, desc, eq, ilike, inArray, or, type SQL } from 'drizzle-orm'
+import { and, count, desc, eq, ilike, inArray, isNotNull, or, type SQL } from 'drizzle-orm'
 import { db } from '../client'
 import {
   account as accountTable,
@@ -151,6 +151,22 @@ export async function updateUserProfile(
 ): Promise<User | null> {
   const rows = await db.update(userTable).set(data).where(eq(userTable.id, id)).returning()
   return rows[0] ?? null
+}
+
+/** 用户是否已设置登录密码（存在 password 非空的 credential 账号）。 */
+export async function hasCredentialPassword(userId: string): Promise<boolean> {
+  const rows = await db
+    .select({ id: accountTable.id })
+    .from(accountTable)
+    .where(
+      and(
+        eq(accountTable.userId, userId),
+        eq(accountTable.providerId, 'credential'),
+        isNotNull(accountTable.password)
+      )
+    )
+    .limit(1)
+  return rows.length > 0
 }
 
 export async function deleteUserById(id: string): Promise<User | null> {

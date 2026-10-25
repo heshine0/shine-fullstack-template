@@ -32,7 +32,7 @@ function navigateAfterLogin() {
 }
 
 type LoginTab = 'email' | 'phone'
-const tab = ref<LoginTab>('email')
+const tab = ref<LoginTab>('phone')
 
 // 邮箱密码
 // 本地联调预填初始管理员账号（生产请勿预填）
@@ -329,17 +329,17 @@ function goBack() {
       <view class="flex p-4">
         <view
           class="h-9 flex flex-1 items-center justify-center rounded-1.5 text-4"
-          :class="tab === 'email' ? 'bg-primary text-white' : 'text-muted'"
-          @click="tab = 'email'"
-        >
-          邮箱密码
-        </view>
-        <view
-          class="h-9 flex flex-1 items-center justify-center rounded-1.5 text-4"
           :class="tab === 'phone' ? 'bg-primary text-white' : 'text-muted'"
           @click="tab = 'phone'"
         >
           手机验证码
+        </view>
+        <view
+          class="h-9 flex flex-1 items-center justify-center rounded-1.5 text-4"
+          :class="tab === 'email' ? 'bg-primary text-white' : 'text-muted'"
+          @click="tab = 'email'"
+        >
+          邮箱密码
         </view>
       </view>
 

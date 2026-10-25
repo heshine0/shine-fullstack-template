@@ -27,6 +27,23 @@ export function verifyChangePhone(phoneNumber: string, code: string) {
   )
 }
 
+/**
+ * 修改密码（已设置过密码的用户）：Better Auth 原生端点，校验原密码后更新。
+ * 原密码错误时返回 400，由响应拦截器统一 toast。
+ */
+export function changePassword(currentPassword: string, newPassword: string) {
+  return http.Post('/auth/change-password', { currentPassword, newPassword }, {
+    meta: { rawAuth: true },
+  })
+}
+
+/** 首次设置密码（手机号/微信等无密码用户）：Better Auth 原生端点，仅需会话。 */
+export function setPassword(newPassword: string) {
+  return http.Post('/auth/set-password', { newPassword }, {
+    meta: { rawAuth: true },
+  })
+}
+
 export interface UploadResult {
   url: string
 }

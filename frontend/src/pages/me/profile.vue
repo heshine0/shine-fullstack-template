@@ -196,6 +196,68 @@ async function handleConfirmPhone() {
     submittingPhone.value = false
   }
 }
+
+// —— 修改/首次设置密码 ——
+const PWD_MIN_LEN = 8
+const PWD_MAX_LEN = 100
+const hasPassword = computed(() => !!auth.user?.hasPassword)
+const editingPwd = ref(false)
+const pwdModalVisible = ref(false)
+const currentPwd = ref('')
+const newPwd = ref('')
+const confirmPwd = ref('')
+const submittingPwd = ref(false)
+
+function openPwdModal() {
+  editingPwd.value = true
+  nextTick(() => {
+    pwdModalVisible.value = true
+  })
+}
+
+function closePwdModal() {
+  // 提交中不允许误关
+  if (submittingPwd.value)
+    return
+  pwdModalVisible.value = false
+  setTimeout(() => {
+    editingPwd.value = false
+  }, 200)
+}
+
+async function handleConfirmPassword() {
+  if (submittingPwd.value)
+    return
+  if (hasPassword.value && !currentPwd.value) {
+    uni.showToast({ title: '请输入原密码', icon: 'none' })
+    return
+  }
+  const pwd = newPwd.value
+  if (pwd.length < PWD_MIN_LEN || pwd.length > PWD_MAX_LEN) {
+    uni.showToast({ title: `密码需 ${PWD_MIN_LEN}-${PWD_MAX_LEN} 位`, icon: 'none' })
+    return
+  }
+  if (pwd !== confirmPwd.value) {
+    uni.showToast({ title: '两次输入的新密码不一致', icon: 'none' })
+    return
+  }
+  submittingPwd.value = true
+  try {
+    await auth.updatePassword(pwd, hasPassword.value ? currentPwd.value : undefined)
+    uni.showToast({ title: '密码已更新', icon: 'success' })
+    pwdModalVisible.value = false
+    editingPwd.value = false
+    currentPwd.value = ''
+    newPwd.value = ''
+    confirmPwd.value = ''
+  }
+  catch {
+    // 错误提示已由响应拦截器统一弹出
+  }
+  finally {
+    submittingPwd.value = false
+  }
+}
 </script>
 
 <template>
@@ -257,6 +319,21 @@ async function handleConfirmPhone() {
             {{ auth.user.email || '—' }}
           </text>
         </view>
+
+        <view
+          class="flex items-center border-t border-line px-4 py-3.5"
+          hover-class="bg-hover"
+          @click="openPwdModal"
+        >
+          <text class="text-4 text-sub">密码</text>
+          <text class="ml-auto text-4 text-muted">
+            {{ hasPassword ? '已设置' : '未设置' }}
+          </text>
+          <view
+            class="i-carbon-chevron-right ml-2 text-4 text-muted transition-transform"
+            :class="editingPwd ? 'rotate-90' : ''"
+          />
+        </view>
       </view>
 
       <!-- 换绑手机号弹窗 -->
@@ -314,6 +391,60 @@ async function handleConfirmPhone() {
             @click="handleConfirmPhone"
           >
             确认绑定
+          </button>
+        </view>
+      </view>
+
+      <!-- 修改/首次设置密码弹窗 -->
+      <view
+        v-if="editingPwd"
+        class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-8 transition-opacity duration-200"
+        :class="pwdModalVisible ? 'opacity-100' : 'opacity-0'"
+        @click="closePwdModal"
+        @touchmove.stop.prevent
+      >
+        <view
+          class="w-full rounded-3 bg-card p-4 shadow-lg transition-all duration-200"
+          :class="pwdModalVisible ? 'scale-100 opacity-100' : 'scale-95 opacity-0'"
+          @click.stop
+        >
+          <view class="mb-3 flex items-center">
+            <text class="text-4 text-ink font-medium">
+              {{ hasPassword ? '修改密码' : '设置密码' }}
+            </text>
+            <view
+              class="i-carbon-close ml-auto p-1 text-4 text-muted"
+              @click="closePwdModal"
+            />
+          </view>
+          <input
+            v-if="hasPassword"
+            v-model="currentPwd"
+            password
+            :maxlength="PWD_MAX_LEN"
+            placeholder="请输入原密码"
+            class="mb-3 box-border h-11 w-full border border-line-strong rounded-2 border-solid px-3 text-4"
+          >
+          <input
+            v-model="newPwd"
+            password
+            :maxlength="PWD_MAX_LEN"
+            :placeholder="`请输入新密码（${PWD_MIN_LEN}-${PWD_MAX_LEN} 位）`"
+            class="mb-3 box-border h-11 w-full border border-line-strong rounded-2 border-solid px-3 text-4"
+          >
+          <input
+            v-model="confirmPwd"
+            password
+            :maxlength="PWD_MAX_LEN"
+            placeholder="请再次输入新密码"
+            class="mb-4 box-border h-11 w-full border border-line-strong rounded-2 border-solid px-3 text-4"
+          >
+          <button
+            :loading="submittingPwd"
+            class="h-11 w-full rounded-2 bg-primary text-4 text-white"
+            @click="handleConfirmPassword"
+          >
+            {{ hasPassword ? '确认修改' : '确认设置' }}
           </button>
         </view>
       </view>

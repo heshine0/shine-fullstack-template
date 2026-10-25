@@ -61,6 +61,18 @@ export const useAuthStore = defineStore(
       await fetchMe()
     }
 
+    /**
+     * 修改/首次设置登录密码：传入原密码走 change-password，
+     * 否则（无密码用户）走 set-password；成功后刷新用户信息同步 hasPassword。
+     */
+    async function updatePassword(newPassword: string, currentPassword?: string): Promise<void> {
+      if (currentPassword)
+        await profileApi.changePassword(currentPassword, newPassword)
+      else
+        await profileApi.setPassword(newPassword)
+      await fetchMe()
+    }
+
     /** 上传头像文件并写入资料，成功后刷新用户信息。 */
     async function updateAvatar(filePath: string): Promise<void> {
       const url = await profileApi.uploadAvatar(filePath)
@@ -105,6 +117,7 @@ export const useAuthStore = defineStore(
       loginByWechat,
       updateName,
       changePhone,
+      updatePassword,
       updateAvatar,
       setAvatar,
       logout,

@@ -10,6 +10,8 @@ export interface AuthUser {
   phoneNumber?: string | null
   phoneNumberVerified?: boolean
   banned?: boolean
+  /** 是否已设置登录密码；false 时改密走 set-password，无需原密码。 */
+  hasPassword?: boolean
   /** 角色名列表，授权判据为是否包含 'admin'。 */
   roles: string[]
   createdAt: string

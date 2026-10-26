@@ -88,11 +88,13 @@ const menuGroups = computed<MeMenuItem[][]>(() => [
     { key: 'theme-brand', label: `主题色（${brandLabel.value}）`, icon: 'i-carbon-color-palette', action: pickThemeBrand },
   ],
   [
-    // web-view 免登录打开后端管理后台（票据 60s 一次性，页面内即时生成）
-    { key: 'admin-web', label: '管理后台', icon: 'i-carbon-dashboard', url: '/pages/webview/admin/index' },
     // WebView 富文本编辑器演示（后端 UEditor + 草稿表中转）
     { key: 'richtext', label: '富文本演示', icon: 'i-carbon-text-bold', url: '/pages/richtext/demo' },
   ],
+  // 管理后台分组仅 admin 角色可见：web-view 免登录打开（票据 60s 一次性，页面内即时生成）
+  ...(auth.isAdmin
+    ? [[{ key: 'admin-web', label: '管理后台', icon: 'i-carbon-dashboard', url: '/pages/webview/admin' }]]
+    : []),
 ])
 
 // 副标题优先展示脱敏手机号，其次邮箱

@@ -20,21 +20,39 @@ function resolveAdminBase(): string {
   return (import.meta.env.VITE_ADMIN_WEB_URL || getEnvBaseUrl()).replace(/\/+$/, '')
 }
 
-async function buildUrl(): Promise<string> {
+/** 目标后台页面路径：仅允许站内路径（单 '/' 开头，排除 '//' 协议相对 URL），缺省/非法回退 /dashboard。 */
+function resolveRedirect(raw?: string): string {
+  if (raw && raw.startsWith('/') && !raw.startsWith('//'))
+    return raw
+  return '/dashboard'
+}
+
+/**
+ * 构建 web-view 目标地址：始终携带一次性票据指向 sso-login 落地页。
+ * 会话有效性由后端落地页判断：Cookie 仍有效则直达目标页（不消耗票据），
+ * 无 Cookie 或已失效才兑换票据完成免登。
+ */
+async function buildUrl(redirect: string): Promise<string> {
   const { token } = await generateOneTimeToken()
-  // token 放 fragment：不随 HTTP 请求行发送、不进服务端访问日志；落地页兑换后立即 replaceState 清除
-  const hash = `ott=${encodeURIComponent(token)}&redirect=${encodeURIComponent('/dashboard')}`
+  // token 放 fragment：不随 HTTP 请求行发送、不进服务端访问日志；落地页处理后 replaceState 清除
+  const hash = `ott=${encodeURIComponent(token)}&redirect=${encodeURIComponent(redirect)}`
   return `${resolveAdminBase()}/sso-login#${hash}`
 }
 
-onLoad(() => {
+onLoad((options) => {
   if (!auth.isLoggedIn) {
     uni.showToast({ title: '请先登录', icon: 'none' })
     setTimeout(() => uni.navigateBack(), 600)
     return
   }
+  // 入口在「我的」页已按角色隐藏，此处兜底防直接 navigateTo 打开
+  if (!auth.isAdmin) {
+    uni.showToast({ title: '无访问权限', icon: 'none' })
+    setTimeout(() => uni.navigateBack(), 600)
+    return
+  }
   // 进入页面的最后一刻才生成票据，最大化 60s 有效窗口
-  buildUrl()
+  buildUrl(resolveRedirect(options?.redirect))
     .then((url) => {
       webSrc.value = url
     })

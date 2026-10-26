@@ -87,10 +87,10 @@ const menuGroups = computed<MeMenuItem[][]>(() => [
     { key: 'theme-mode', label: `外观模式（${modeLabel.value}）`, icon: 'i-carbon-contrast', action: pickThemeMode },
     { key: 'theme-brand', label: `主题色（${brandLabel.value}）`, icon: 'i-carbon-color-palette', action: pickThemeBrand },
   ],
-  [
-    // web-view 免登录打开后端管理后台（票据 60s 一次性，页面内即时生成）
-    { key: 'admin-web', label: '管理后台', icon: 'i-carbon-dashboard', url: '/pages/webview/admin/index' },
-  ],
+  // 管理后台分组仅 admin 角色可见：web-view 免登录打开（票据 60s 一次性，页面内即时生成）
+  ...(auth.isAdmin
+    ? [[{ key: 'admin-web', label: '管理后台', icon: 'i-carbon-dashboard', url: '/pages/webview/admin' }]]
+    : []),
 ])
 
 // 副标题优先展示脱敏手机号，其次邮箱

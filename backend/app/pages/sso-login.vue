@@ -1,12 +1,14 @@
 <script setup lang="ts">
 /**
- * 小程序 web-view 一次性票据免登录落地页（匿名可访问，见 auth.global.ts 白名单）。
+ * 小程序 web-view 免登录落地页（匿名可访问，见 auth.global.ts 白名单）。
  * URL 形如 /sso-login#ott=<token>&redirect=/dashboard（token 放 fragment，不进服务端日志），
  * 兼容 /sso-login?ott=<token> 查询参数兜底（手工测试）。
+ * 进入时 auth.global.ts 已探测会话：Cookie 仍有效则直接复用会话跳目标页（不消耗票据），
+ * 无 Cookie 或已失效才走 one-time-token 兑换。
  */
 definePageMeta({ layout: false })
 
-const { fetchMe } = useAuth()
+const { user, fetchMe } = useAuth()
 const toast = useToast()
 
 const loading = ref(true)
@@ -38,6 +40,16 @@ function readParams(): { token: string | null, redirect: string } {
 
 async function exchange() {
   const { token, redirect } = readParams()
+
+  // 会话 Cookie 仍有效（auth.global.ts 进入本页前已 fetchMe 探测）：
+  // 直接复用现有会话直达目标页，不消耗一次性票据；同时清除地址栏中的票据
+  if (user.value) {
+    window.history.replaceState(null, '', window.location.pathname)
+    await navigateTo(redirect, { replace: true })
+    return
+  }
+
+  // 无 Cookie 或会话已失效：用一次性票据兑换新会话
   if (!token) {
     loading.value = false
     errorMessage.value = '登录链接缺少临时票据，请返回小程序重新进入'

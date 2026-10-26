@@ -95,13 +95,16 @@ bun run dev:h5       # http://localhost:9000
      props/事件以随包源码 `node_modules/@wot-ui/ui/components/wd-*/types.ts` 为准。
    - `tsconfig.json` 的 types **不要加 `@wot-ui/ui/global`**（会令 vue-tsc 转译库内 `.vue`
      源、刷出大量库类型错）；运行时类型由 easycom 解析，不依赖该全局入口。
-6. **web-view 免登录管理后台**：入口在「我的」页 → `/pages/webview/admin/index`；页面 onLoad
-   调 `generateOneTimeToken()`（`src/api/auth.ts`，GET `/auth/one-time-token/generate`，
-   rawAuth）取 60s 一次性票据，拼 `${VITE_ADMIN_WEB_URL}/sso-login#ott=...&redirect=/dashboard`
-   给 `<web-view>`，后台落地页兑换成 Cookie 会话。`VITE_ADMIN_WEB_URL` 缺省回退
-   `getEnvBaseUrl()`（含微信 develop/trial/release 覆写）。生产须 HTTPS 且在小程序后台配置
-   「业务域名」；开发者工具联调勾选「不校验合法域名」，真机用电脑局域网 IP。
-   web-view 与小程序**共享同一条 Better Auth session**（任一端退出会同时失效）。
+6. **web-view 免登录管理后台**：入口在「我的」页 → `/pages/webview/admin`（仅 admin 角色
+   可见，页面 onLoad 另有 admin 守卫兜底）；支持 `?redirect=/xxx` 指定目标后台页面
+   （仅站内路径，缺省 `/dashboard`）。页面 onLoad 调 `generateOneTimeToken()`
+   （`src/api/auth.ts`，GET `/auth/one-time-token/generate`，rawAuth）取 60s 一次性票据，
+   拼 `${VITE_ADMIN_WEB_URL}/sso-login#ott=...&redirect=...` 给 `<web-view>`；
+   后台落地页先复用有效会话直达目标页（不消耗票据），无 Cookie/已失效才兑换票据写会话。
+   `VITE_ADMIN_WEB_URL` 缺省回退 `getEnvBaseUrl()`（含微信 develop/trial/release 覆写）。
+   生产须 HTTPS 且在小程序后台配置「业务域名」；开发者工具联调勾选「不校验合法域名」，
+   真机用电脑局域网 IP。web-view 与小程序**共享同一条 Better Auth session**
+   （任一端退出会同时失效）。
 
 ## 6. Windows / PowerShell 注意事项
 

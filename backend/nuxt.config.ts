@@ -1,3 +1,5 @@
+import packageJson from './package.json'
+
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
   modules: [
@@ -10,6 +12,12 @@ export default defineNuxtConfig({
   },
 
   css: ['~/assets/css/main.css'],
+
+  runtimeConfig: {
+    public: {
+      appVersion: packageJson.version
+    }
+  },
 
   routeRules: {
     '/': { prerender: true }

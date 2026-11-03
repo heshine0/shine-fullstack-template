@@ -3,6 +3,7 @@ import type { Component } from 'vue'
 
 const route = useRoute()
 const { user, isAdmin, logout } = useAuth()
+const { public: { appVersion } } = useRuntimeConfig()
 const toast = useToast()
 
 interface NavItem {
@@ -63,6 +64,9 @@ const mobileOpen = ref(false)
           {{ item.label }}
         </NuxtLink>
       </nav>
+      <div class="border-t border-default p-4 text-xs text-muted">
+        v{{ appVersion }}
+      </div>
     </aside>
 
     <div class="flex-1 flex flex-col min-w-0">
@@ -118,24 +122,29 @@ const mobileOpen = ref(false)
       title="导航"
       class="md:hidden"
     >
-      <nav class="p-2 space-y-1">
-        <NuxtLink
-          v-for="item in visibleNav"
-          :key="item.to"
-          :to="item.to"
-          class="flex items-center gap-2.5 rounded-md px-3 py-2.5 text-sm font-medium"
-          :class="isActive(item.to)
-            ? 'bg-primary text-white'
-            : 'text-muted hover:bg-elevated hover:text-highlighted'"
-          @click="mobileOpen = false"
-        >
-          <UIcon
-            :name="item.icon"
-            class="size-4"
-          />
-          {{ item.label }}
-        </NuxtLink>
-      </nav>
+      <div class="flex h-full flex-col">
+        <nav class="flex-1 p-2 space-y-1">
+          <NuxtLink
+            v-for="item in visibleNav"
+            :key="item.to"
+            :to="item.to"
+            class="flex items-center gap-2.5 rounded-md px-3 py-2.5 text-sm font-medium"
+            :class="isActive(item.to)
+              ? 'bg-primary text-white'
+              : 'text-muted hover:bg-elevated hover:text-highlighted'"
+            @click="mobileOpen = false"
+          >
+            <UIcon
+              :name="item.icon"
+              class="size-4"
+            />
+            {{ item.label }}
+          </NuxtLink>
+        </nav>
+        <div class="border-t border-default p-4 text-xs text-muted">
+          v{{ appVersion }}
+        </div>
+      </div>
     </USlideover>
   </div>
 </template>
